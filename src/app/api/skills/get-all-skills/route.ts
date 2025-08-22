@@ -4,30 +4,29 @@ import { API_BASE_URL } from "@/lib/api";
 
 export async function GET(req: NextRequest) {
   try {
-    const token = await requireAuth();
-    
-    // Get all cookies from the incoming request
-    const cookieHeader = req.cookies.toString();
+    const token = await requireAuth(); // must return valid JWT or throw
+    const cookieHeader = Object.entries(req.cookies)
+      .map(([key, val]) => `${key}=${val}`)
+      .join("; ");
 
     const backendRes = await fetch(`${API_BASE_URL}/skills/get-all-skills`, {
       method: "GET",
       headers: {
-        cookie: cookieHeader,
-        // Also forward the authorization if needed
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
+        ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      credentials: 'include' // Important for cookies
+      credentials: 'include'
     });
 
     if (!backendRes.ok) {
-      const errorText = await backendRes.text();
-      return new NextResponse(errorText, { status: backendRes.status });
+      const text = await backendRes.text();
+      return new NextResponse(text, { status: backendRes.status });
     }
 
     const data = await backendRes.json();
     return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error in skills API:", error);
-    return new NextResponse("Unauthorized", { status: 401 });
+  } catch (err: any) {
+    console.error("Proxy route error:", err);
+    return new NextResponse(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
   }
 }
