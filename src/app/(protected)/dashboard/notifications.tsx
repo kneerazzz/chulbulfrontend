@@ -55,7 +55,7 @@ export default function NotificationDrawer({ open, onOpenChange }: NotificationD
     try {
       let endpoint = "/notifications/get-all-notifications";
       if (activeTab === "unread") {
-        endpoint = "/notifications/get-unread-notifications";
+        endpoint = "/notifications/get-unreaded-notifications";
       } else if (activeTab === "today") {
         endpoint = "/notifications/get-today-notifications";
       }

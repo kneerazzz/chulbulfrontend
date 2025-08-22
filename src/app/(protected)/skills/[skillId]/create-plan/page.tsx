@@ -139,11 +139,9 @@ export default function CreateSkillPlanPage() {
         targetLevel,
         durationInDays
       };
-      console.log(formData);
       const res = await api.post(`/skillplans/c/${skillId}/create-skill-plan`, formData, {
         withCredentials: true
       });
-      console.log(res.data.data);
       const response = res.data.data;
       const skillPlanId = response._id;
       router.push(`/skillPlans/${skillPlanId}`);

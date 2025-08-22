@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, RefreshCw, Trash2, Calendar, BookOpen, Lightbulb } from 'lucide-react';
 import { toast } from 'sonner';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/components/ui/card';
 import { Button } from '@/app/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert';
@@ -13,7 +15,7 @@ import { api } from '@/lib/api';
 interface DailyTopicProps {
   skillPlanId: string;
   day: number;
-  currentDay: number; // Add currentDay prop
+  currentDay: number;
 }
 
 interface TopicData {
@@ -38,7 +40,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
   const isCurrentDay = day === currentDay;
   const isPastDay = day < currentDay;
   const isFutureDay = day > currentDay;
-  const canEdit = isCurrentDay; // Only current day can be edited
+  const canEdit = isCurrentDay;
 
   // Fetch topic data
   useEffect(() => {
@@ -91,7 +93,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
       if (res.status !== 200) throw new Error('Failed to delete topic');
       
       toast.success("Topic deleted successfully");
-      setTopic(null); // Clear the topic locally
+      setTopic(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Deletion failed');
     } finally {
@@ -196,18 +198,129 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
       </CardHeader>
 
       <CardContent className="space-y-6">
-        <div className="prose prose-lg max-w-none">
-          <div 
-            className="leading-7 text-foreground/90"
-            dangerouslySetInnerHTML={{ __html: topic.content }} 
-          />
+        <div className="markdown-content">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              // Custom styling for different markdown elements
+              h1: ({children}) => (
+                <h1 className="text-2xl font-bold mb-4 text-primary border-b-2 border-primary/20 pb-2">
+                  {children}
+                </h1>
+              ),
+              h2: ({children}) => (
+                <h2 className="text-xl font-semibold mb-3 text-primary mt-6">
+                  {children}
+                </h2>
+              ),
+              h3: ({children}) => (
+                <h3 className="text-lg font-medium mb-2 text-foreground mt-4">
+                  {children}
+                </h3>
+              ),
+              h4: ({children}) => (
+                <h4 className="text-base font-medium mb-2 text-foreground mt-3">
+                  {children}
+                </h4>
+              ),
+              p: ({children}) => (
+                <p className="mb-4 leading-7 text-foreground/90">
+                  {children}
+                </p>
+              ),
+              ul: ({children}) => (
+                <ul className="mb-4 pl-6 space-y-2 list-disc marker:text-primary">
+                  {children}
+                </ul>
+              ),
+              ol: ({children}) => (
+                <ol className="mb-4 pl-6 space-y-2 list-decimal marker:text-primary">
+                  {children}
+                </ol>
+              ),
+              li: ({children}) => (
+                <li className="leading-6 text-foreground/90">
+                  {children}
+                </li>
+              ),
+              blockquote: ({children}) => (
+                <blockquote className="border-l-4 border-primary/30 pl-4 py-2 mb-4 bg-muted/30 rounded-r-lg italic text-foreground/80">
+                  {children}
+                </blockquote>
+              ),
+              code: ({node, className, children, ...props}: any) => {
+                const match = /language-(\w+)/.exec(className || '');
+                const inline = !match;
+                
+                if (inline) {
+                  return (
+                    <code className="bg-muted px-2 py-1 rounded text-sm font-mono text-primary" {...props}>
+                      {children}
+                    </code>
+                  );
+                }
+                
+                return (
+                  <div className="mb-4">
+                    <pre className="bg-muted p-4 rounded-lg overflow-x-auto border">
+                      <code className={`text-sm font-mono ${className}`} {...props}>
+                        {children}
+                      </code>
+                    </pre>
+                  </div>
+                );
+              },
+              strong: ({children}) => (
+                <strong className="font-semibold text-primary">
+                  {children}
+                </strong>
+              ),
+              em: ({children}) => (
+                <em className="italic text-foreground/80">
+                  {children}
+                </em>
+              ),
+              table: ({children}) => (
+                <div className="overflow-x-auto mb-4">
+                  <table className="min-w-full border border-border rounded-lg">
+                    {children}
+                  </table>
+                </div>
+              ),
+              thead: ({children}) => (
+                <thead className="bg-muted">
+                  {children}
+                </thead>
+              ),
+              tbody: ({children}) => (
+                <tbody className="divide-y divide-border">
+                  {children}
+                </tbody>
+              ),
+              th: ({children}) => (
+                <th className="px-4 py-3 text-left font-medium text-foreground">
+                  {children}
+                </th>
+              ),
+              td: ({children}) => (
+                <td className="px-4 py-3 text-foreground/90">
+                  {children}
+                </td>
+              ),
+              hr: () => (
+                <hr className="my-6 border-border" />
+              )
+            }}
+          >
+            {topic.content}
+          </ReactMarkdown>
         </div>
 
         {topic.optionalTip && (
-          <Alert className="bg-gradient-to-r from-gray-500 to-gray-300 border-amber-200">
-            <Lightbulb className="h-5 w-5 text-amber-600" />
-            <AlertTitle className="text-red-800">Pro Tip</AlertTitle>
-            <AlertDescription className="text-amber-900">
+          <Alert className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200 dark:border-amber-800">
+            <Lightbulb className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            <AlertTitle className="text-amber-800 dark:text-amber-200">Pro Tip</AlertTitle>
+            <AlertDescription className="text-amber-900 dark:text-amber-300">
               {topic.optionalTip}
             </AlertDescription>
           </Alert>

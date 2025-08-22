@@ -44,7 +44,6 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       router.push("/skills");
 
     } catch (error) {
-      console.log("error here", error);
       setError("Failed to delete skill");
       toast.error("Failed to delete skill");
     }
@@ -57,7 +56,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
 
       router.push(`/skills/${skillId}/create-plan`);
     } catch (error) {
-      console.log("Error in create-plan", error);
+      console.error("Error in create-plan", error);
       setError("Failed to create-plan");
     }
   }
@@ -70,7 +69,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       router.push(`/skills/${skillId}/update`);
 
     } catch (error) {
-      console.log("Error in updating skill", error);
+      console.error("Error in updating skill", error);
       setError("Failed to update skill");
     }
   }
@@ -80,8 +79,6 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       try {
         const resolvedParams = await params;
         const { skillId } = resolvedParams;
-
-        console.log("[Frontend] Fetching skill with ID:", skillId);
 
         const response = await api.get(`/skills/c/${skillId}/get-skill`, {
           withCredentials: true

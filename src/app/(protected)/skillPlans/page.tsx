@@ -75,7 +75,6 @@ export default function SkillPlansOverview() {
       try {
         const res = await api.get("/skillplans/get-skill-plans");
         const response = res.data.data;
-        console.log(response);
         setSkillPlans(response);
       } catch (err) {
         console.error("Failed to fetch skill plans:", err);
