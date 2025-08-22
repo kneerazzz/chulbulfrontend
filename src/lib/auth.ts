@@ -5,25 +5,54 @@ import { NextResponse } from "next/server";
  * Get the access token from cookies
  */
 export async function getAccessToken(): Promise<string | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("accessToken")?.value ?? null;
   return token;
 }
 
 /**
  * Require authentication for server-side routes
- * Throws a NextResponse with 401 if no valid token is found
+ * Returns the token if valid, or returns a 401 NextResponse if not
  */
-export async function requireAuth(): Promise<string> {
+export async function requireAuth(): Promise<string | NextResponse> {
   const token = await getAccessToken();
-
+  
   if (!token) {
     console.warn("Unauthorized access - no token found");
-    throw new NextResponse(
+    return new NextResponse(
       JSON.stringify({ message: "Unauthorized" }),
-      { status: 401 }
+      { 
+        status: 401,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
+  
+  return token;
+}
 
+/**
+ * Alternative: Create a custom error class if you prefer throwing errors
+ */
+export class AuthError extends Error {
+  constructor(message: string, public statusCode: number = 401) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
+
+/**
+ * Alternative requireAuth that throws a custom error
+ */
+export async function requireAuthWithError(): Promise<string> {
+  const token = await getAccessToken();
+  
+  if (!token) {
+    console.warn("Unauthorized access - no token found");
+    throw new AuthError("Unauthorized");
+  }
+  
   return token;
 }
