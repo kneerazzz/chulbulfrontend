@@ -1,10 +1,10 @@
 'use client'
 
+import { api } from "@/lib/api"
 import { useQuery } from "@tanstack/react-query"
-import axios from "axios"
 
 const fetchUser = async () => {
-  const res = await axios.get("/users/get-user-details", { withCredentials: true })
+  const res = await api.get("/users/get-user-details", { withCredentials: true })
   return res.data.data
 }
 
