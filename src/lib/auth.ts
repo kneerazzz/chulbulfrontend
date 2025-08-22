@@ -1,15 +1,29 @@
 import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
-export async function getAcccessToken() {
-    const cookieStore = await cookies();
-    return cookieStore.get("accessToken")?.value || null;
+/**
+ * Get the access token from cookies
+ */
+export async function getAccessToken(): Promise<string | null> {
+  const cookieStore = cookies();
+  const token = cookieStore.get("accessToken")?.value ?? null;
+  return token;
 }
 
-export async function requireAuth() {
-    const token = await getAcccessToken();
-    if(!token){
-        console.log("Unauthorised access - no token found");
-        throw new Error("Unauthorised");
-    }
-    return token;
+/**
+ * Require authentication for server-side routes
+ * Throws a NextResponse with 401 if no valid token is found
+ */
+export async function requireAuth(): Promise<string> {
+  const token = await getAccessToken();
+
+  if (!token) {
+    console.warn("Unauthorized access - no token found");
+    throw new NextResponse(
+      JSON.stringify({ message: "Unauthorized" }),
+      { status: 401 }
+    );
+  }
+
+  return token;
 }
