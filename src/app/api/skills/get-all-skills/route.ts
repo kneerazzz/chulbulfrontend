@@ -5,49 +5,30 @@ import { cookies } from "next/headers";
 
 export async function GET(req: NextRequest) {
   try {
-    const authResult = await requireAuth();
-    
-    // Handle the case where requireAuth returns NextResponse (401)
-    if (authResult instanceof NextResponse) {
-      return authResult;
+    // Get token from server-side cookies
+    const token = await requireAuth();
+    if (!token) {
+      return new NextResponse(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
     }
-    
-    const token = authResult;
-    
-    // ✅ PRODUCTION FIX: Use both methods for compatibility
-    let cookieHeader = '';
-    
-    try {
-      // Method 1: Next.js cookies() function (recommended for production)
-      const cookieStore = await cookies();
-      cookieHeader = cookieStore.toString();
-    } catch (cookieError) {
-      // Method 2: Fallback to request cookies (for older versions)
-      cookieHeader = req.cookies.toString();
-    }
-    
-    // ✅ Alternative: Manual cookie extraction that works in both dev and prod
-    if (!cookieHeader) {
-      const cookieStore = await cookies();
-      const allCookies = cookieStore.getAll();
-      cookieHeader = allCookies
-        .map(cookie => `${cookie.name}=${cookie.value}`)
-        .join('; ');
-    }
-    
-    // Debug logs
-    console.log("🍪 Cookie header:", cookieHeader);
-    console.log("🔑 Token:", token ? "Present" : "Missing");
-    
+
+    // Get all cookies from server-side
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll()
+      .map(c => `${c.name}=${c.value}`)
+      .join("; ");
+
+    console.log("🍪 Forwarding cookies:", cookieHeader);
+    console.log("🔑 Token present:", !!token);
+
+    // Forward request to backend
     const backendRes = await fetch(`${API_BASE_URL}/skills/get-all-skills`, {
       method: "GET",
       headers: {
+        "Cookie": cookieHeader,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
-        // ✅ FIXED: Proper header name capitalization
-        ...(cookieHeader ? { "Cookie": cookieHeader } : {}),
-        ...(token ? { "Authorization": `Bearer ${token}` } : {}),
       },
-      credentials: 'include'
+      credentials: "include",
     });
 
     if (!backendRes.ok) {
@@ -58,12 +39,9 @@ export async function GET(req: NextRequest) {
 
     const data = await backendRes.json();
     return NextResponse.json(data);
-    
-  } catch (error: any) {
-    console.error("Error in skills API:", error);
-    return NextResponse.json(
-      { message: "Internal server error" }, 
-      { status: 500 }
-    );
+
+  } catch (err: any) {
+    console.error("Proxy error:", err);
+    return new NextResponse(JSON.stringify({ message: "Internal server error" }), { status: 500 });
   }
 }
