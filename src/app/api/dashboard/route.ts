@@ -12,7 +12,7 @@ export async function GET(req: NextRequest){
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    cookie: cookieHeader,
+                    "Cookie": cookieHeader,
                     ...(token? {Authorization: `Bearer ${token}`} : {} )
                 },
                 credentials: 'include'
