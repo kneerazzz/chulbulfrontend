@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Textarea } from "@/app/components/ui/textarea";
-import axios from "axios";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 export default function EditProfile({ user }: { user: any }) {
   const [formData, setFormData] = useState({
@@ -35,7 +35,7 @@ export default function EditProfile({ user }: { user: any }) {
           .filter((i: any) => i.length > 0),
       };
 
-      const res = await axios.patch(`/api/auth/update-details`, payload, {withCredentials: true});
+      const res = await api.patch(`/users/update-details`, payload, {withCredentials: true});
       if (res.data.statusCode !== 200) throw new Error(await res.data.message);
       toast.success("Profile updated successfully!!")
     } catch (err: any) {

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
-import axios from "axios";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 export default function ChangeProfilePic({ user }: { user: any }) {
   const [file, setFile] = useState<File | null>(null);
@@ -25,7 +25,7 @@ export default function ChangeProfilePic({ user }: { user: any }) {
             const formData = new FormData();
             formData.append("profilePic", file); // 👈 backend expects this exact key
 
-            const res = await axios.patch("/api/auth/change-profilepic", formData, {withCredentials: true});
+            const res = await api.patch("/users/update-profile-pic", formData, {withCredentials: true});
 
             if(res.data.statusCode !== 200){
                 console.error("Error uploading pic")

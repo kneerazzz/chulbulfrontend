@@ -1,6 +1,5 @@
 'use client'
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
 import {
   Sheet,
   SheetContent,
@@ -27,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Skeleton } from "@/app/components/ui/skeleton";
+import { api } from "@/lib/api";
 
 // Define the Notification interface
 interface Notification {
@@ -53,14 +53,14 @@ export default function NotificationDrawer({ open, onOpenChange }: NotificationD
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      let endpoint = "/api/notifications/get-notifications";
+      let endpoint = "/notifications/get-all-notifications";
       if (activeTab === "unread") {
-        endpoint = "/api/notifications/unread-notifications";
+        endpoint = "/notifications/get-unread-notifications";
       } else if (activeTab === "today") {
-        endpoint = "/api/notifications/today-notifications";
+        endpoint = "/notifications/get-today-notifications";
       }
 
-      const res = await axios.get(endpoint, { withCredentials: true });
+      const res = await api.get(endpoint, { withCredentials: true });
       setNotifications(res.data.data || []);
 
       if (activeTab === "all") {
@@ -87,7 +87,7 @@ export default function NotificationDrawer({ open, onOpenChange }: NotificationD
       setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
       setUnreadCount(0);
 
-      await axios.patch("/api/notifications/mark-all-read", {}, { withCredentials: true });
+      await api.patch("/notifications/mark-all-notifications-read", {}, { withCredentials: true });
     } catch (err) {
       console.error(err);
       // Optionally: fetchNotifications() here to recover state if API failed
@@ -109,7 +109,7 @@ export default function NotificationDrawer({ open, onOpenChange }: NotificationD
         return prev.map(n => n._id === id ? { ...n, isRead: true } : n);
       });
 
-      await axios.patch(`/api/notifications/mark-read?id=${id}`);
+      await api.patch(`/notifications/c/${id}/mark-as-read`);
     } catch (err) {
       console.error(err);
     }
@@ -127,7 +127,7 @@ export default function NotificationDrawer({ open, onOpenChange }: NotificationD
           return prev.filter(n => n._id !== id);
         });
 
-        await axios.delete(`/api/notifications/delete-notification?id=${id}`);
+        await api.delete(`/notifications/c/${id}/delete-notification`);
       } catch (err) {
         console.error(err);
       }

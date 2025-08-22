@@ -45,7 +45,7 @@ import {
   History,
   ArrowRight
 } from "lucide-react";
-import axios from "axios";
+import { api } from "@/lib/api";
 
 const UpdateSkillPage = () => {
   const router = useRouter();
@@ -147,7 +147,7 @@ const UpdateSkillPage = () => {
   useEffect(() => {
     const fetchSkill = async () => {
       try {
-        const response = await axios.get(`/api/skills/get-skill?skillId=${skillId}`, {
+        const response = await api.get(`/skills/c/${skillId}/get-skill`, {
           withCredentials: true,
         });
 
@@ -220,7 +220,7 @@ const UpdateSkillPage = () => {
     setIsLoading(true);
 
     try {
-      await axios.patch(`/api/skills/update-skill?skillId=${skillId}`, formData, {
+      await api.patch(`/skills/c/${skillId}update-skill`, formData, {
         withCredentials: true,
       });
       toast.success("Skill updated successfully!");

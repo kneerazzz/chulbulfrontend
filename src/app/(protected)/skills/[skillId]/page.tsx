@@ -5,7 +5,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/ca
 import { Badge } from "@/app/components/ui/badge";
 import { Progress } from "@/app/components/ui/progress";
 import { Skill } from "@/types";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -24,6 +23,7 @@ import {
   BarChart3,
   Award
 } from "lucide-react";
+import { api } from "@/lib/api";
 
 export default function SkillDetailPage({ params }: { params: Promise<{ skillId: string }> }) {
   const [skill, setSkill] = useState<Skill | null>(null);
@@ -36,7 +36,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       const resolvedParams = await params;
       const { skillId } = resolvedParams;
 
-      await axios.delete(`/api/skills/delete-skill?skillId=${skillId}`, {
+      await api.delete(`/skills/c/${skillId}/delete-skill`, {
         withCredentials: true
       });
 
@@ -83,7 +83,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
 
         console.log("[Frontend] Fetching skill with ID:", skillId);
 
-        const response = await axios.get(`/api/skills/get-skill?skillId=${skillId}`, {
+        const response = await api.get(`/skills/c/${skillId}/get-skill`, {
           withCredentials: true
         });
 

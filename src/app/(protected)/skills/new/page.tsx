@@ -45,7 +45,7 @@ import {
   Users, 
   Sigma 
 } from "lucide-react";
-import axios from "axios";
+import { api } from "@/lib/api";
 
 const NewSkillPage = () => {
   const router = useRouter();
@@ -222,7 +222,7 @@ const NewSkillPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("/api/skills/create-skill", formData, {
+      const response = await api.post("/skills/create-skill", formData, {
         withCredentials: true
       });
       const { _id } = response.data.data;

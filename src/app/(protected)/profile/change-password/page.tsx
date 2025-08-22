@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 export default function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState("");
@@ -26,8 +26,8 @@ export default function ChangePasswordPage() {
 
     setLoading(true);
     try {
-      const res = await axios.patch(
-        "/api/auth/change-password",
+      const res = await api.patch(
+        "/users/change-password",
         { oldPassword, newPassword, confirmPassword },
         { withCredentials: true }
       );

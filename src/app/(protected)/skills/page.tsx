@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { toast } from "sonner";
 import { Skill } from "@/types";
 import { Button } from "@/app/components/ui/button";
@@ -20,6 +19,7 @@ import {
   Award,
   ArrowRight
 } from "lucide-react";
+import { api } from "@/lib/api";
 
 export default function SkillsPage() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export default function SkillsPage() {
   useEffect(() => {
     const fetchSkills = async () => {
       try {
-        const response = await axios.get("/api/skills/get-all-skills", { withCredentials: true });
+        const response = await api.get("/skills/get-all-skills", { withCredentials: true });
         const skills = response.data.data;
         setSkills(skills);
       } catch (error: any) {

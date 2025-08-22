@@ -40,7 +40,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/app/components/ui/ta
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select'
 import { Input } from '@/app/components/ui/input'
 import { Skeleton } from '@/app/components/ui/skeleton'
-import axios from 'axios'
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import NotificationDrawer from './notifications'
