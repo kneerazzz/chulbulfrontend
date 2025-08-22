@@ -19,8 +19,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { format, addDays,} from "date-fns";
-import axios from "axios";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 // Common interfaces
 interface Skill {
@@ -82,7 +82,7 @@ export default function EditSkillPlanPage() {
   useEffect(() => {
     const fetchSkillPlan = async () => {
       try {
-        const res = await axios.get(`/api/skillPlan/get-plan?skillPlanId=${skillPlanId}`);
+        const res = await api.get(`/skillplans/c/${skillPlanId}get-skill-plan`);
         const data = res.data.data;
         setSkillPlan(data);
         setDuration(data.durationInDays);
@@ -111,7 +111,7 @@ export default function EditSkillPlanPage() {
             priority: priority,
             estimatedHoursPerDay: estimatedHours
         };
-      await axios.patch(`/api/skillPlan/update-plan?skillPlanId=${skillPlanId}`, updatedDetails);
+      await api.patch(`/skillplans/c/${skillPlanId}update-skill-plan`, updatedDetails);
       
       toast.success("Skill plan updated successfully");
       router.push(`/skillPlans/${skillPlanId}`);
@@ -128,7 +128,7 @@ export default function EditSkillPlanPage() {
     if (!confirm("Are you sure you want to delete this skill plan? This action cannot be undone.")) return;
     
     try {
-      await axios.delete(`/api/skillPlan/delete-plan?skillPlanId=${skillPlanId}`);
+      await api.delete(`/skillplans/c/${skillPlanId}/delete-skill-plan`);
       toast.success("Skill plan deleted successfully");
       router.push("/skillPlans");
     } catch (err) {

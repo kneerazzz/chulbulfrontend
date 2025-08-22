@@ -6,7 +6,7 @@ import { Loader2, CheckCircle, ArrowLeft, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardFooter } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
-import axios from 'axios';
+import { api } from '@/lib/api';
 
 export default function SessionActions({
   skillPlanId,
@@ -33,8 +33,8 @@ export default function SessionActions({
     try {
       setIsCompleting(true);
       
-      const res = await axios.patch(
-        `/api/skillPlan/complete-day?skillPlanId=${skillPlanId}`,
+      const res = await api.patch(
+        `/skillplans/c/${skillPlanId}/complete-current-day`,
         { withCredentials: true }
       );
       if (res.status === 200) {

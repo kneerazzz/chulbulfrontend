@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/comp
 import { Button } from '@/app/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/app/components/ui/alert';
 import { Badge } from '@/app/components/ui/badge';
-import axios from 'axios';
+import { api } from '@/lib/api';
 
 interface DailyTopicProps {
   skillPlanId: string;
@@ -46,7 +46,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
       try {
         setLoading(true);
         setError(null);
-        const res = await axios.get(`/api/dailyTopic/get-topic?skillPlanId=${skillPlanId}&day=${day}`, {
+        const res = await api.get(`/dailyTopics/c/${skillPlanId}/get-topic?day=${day}`, {
           withCredentials: true
         });
         
@@ -66,7 +66,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
   const handleRegenerate = async () => {
     try {
       setRegenerating(true);
-      const res = await axios.get(`/api/dailyTopic/regenerate-topic?skillPlanId=${skillPlanId}`, {
+      const res = await api.get(`/dailyTopics/c/${skillPlanId}/regenerate-topic`, {
         withCredentials: true
       });
 
@@ -84,7 +84,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
   const handleDelete = async () => {
     try {
       setDeleting(true);
-      const res = await axios.delete(`/api/dailyTopic/delete-topic?skillPlanId=${skillPlanId}&day=${day}`, {
+      const res = await api.delete(`/dailyTopics/c/${skillPlanId}/delete-topic`, {
         withCredentials: true
       });
 

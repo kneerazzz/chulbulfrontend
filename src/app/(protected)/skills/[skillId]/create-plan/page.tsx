@@ -28,7 +28,7 @@ import {
   Globe,
   Briefcase
 } from "lucide-react";
-import axios from "axios";
+import { api } from "@/lib/api";
 
 export default function CreateSkillPlanPage() {
   const router = useRouter();
@@ -113,7 +113,7 @@ export default function CreateSkillPlanPage() {
   useEffect(() => {
     async function fetchSkill() {
       try {
-        const res = await axios.get(`/api/skills/get-skill?skillId=${skillId}`);
+        const res = await api.get(`/skills/c/${skillId}/get-skill`);
         setSkill({
           title: res.data.data.title,
           category: res.data.data.category,
@@ -140,7 +140,7 @@ export default function CreateSkillPlanPage() {
         durationInDays
       };
       console.log(formData);
-      const res = await axios.post(`/api/skillPlan/create-plan?skillId=${skillId}`, formData, {
+      const res = await api.post(`/skillplans/c/${skillId}/create-skill-plan`, formData, {
         withCredentials: true
       });
       console.log(res.data.data);

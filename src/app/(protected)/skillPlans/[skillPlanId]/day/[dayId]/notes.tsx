@@ -7,7 +7,7 @@ import { Loader2, Edit, Save, Trash2, Plus, BookOpen } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import { toast } from 'sonner';
-import axios from 'axios';
+import { api } from "@/lib/api";
 
 export default function Notes({
   skillPlanId,
@@ -39,8 +39,8 @@ export default function Notes({
   const fetchNotes = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get(
-        `/api/notes/get-note?skillPlanId=${skillPlanId}&day=${day}`,
+      const res = await api.get(
+        `/notes/c/${skillPlanId}/get-note?day=${day}`,
         { withCredentials: true }
       );
 
@@ -80,8 +80,8 @@ export default function Notes({
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      const res = await axios.patch(
-        `/api/notes/update-note?skillPlanId=${skillPlanId}&day=${day}`,
+      const res = await api.patch(
+        `/notes/c/${skillPlanId}/update-note?day=${day}`,
         { content },
         { withCredentials: true }
       );
@@ -102,8 +102,8 @@ export default function Notes({
   const handleCreate = async () => {
     try {
       setIsSaving(true);
-      const res = await axios.post(
-        `/api/notes/create-note?skillPlanId=${skillPlanId}&day=${day}`,
+      const res = await api.post(
+        `/notes/c/${skillPlanId}/create-note?day=${day}`,
         { content },
         { withCredentials: true }
       );
@@ -124,8 +124,8 @@ export default function Notes({
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const res = await axios.delete(
-        `/api/notes/delete-note?skillPlanId=${skillPlanId}&day=${day}`,
+      const res = await api.delete(
+        `/notes/c/${skillPlanId}/delete-note?day=${day}`,
         { withCredentials: true }
       );
 

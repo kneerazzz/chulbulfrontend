@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -42,6 +41,7 @@ import {
   YAxis,
   Tooltip,
 } from "recharts";
+import { api } from "@/lib/api";
 
 interface SkillPlanDetail {
   _id: string;
@@ -87,8 +87,8 @@ export default function SkillPlanDetailPage() {
       try {
         setLoading(true);
         const [planRes, progressRes] = await Promise.all([
-          axios.get(`/api/skillPlan/get-plan?skillPlanId=${skillPlanId}`, { withCredentials: true }),
-          axios.get(`/api/skillPlan/plan-progress?skillPlanId=${skillPlanId}`, { withCredentials: true }),
+          api.get(`/skillplans/c/${skillPlanId}/get-skill-plan`, { withCredentials: true }),
+          api.get(`/skillplans/c/${skillPlanId}/get-progress`, { withCredentials: true }),
         ]);
 
         if (!mounted) return;
@@ -184,7 +184,7 @@ export default function SkillPlanDetailPage() {
   // -------- Actions --------
   const deleteSkillPlan = async () => {
     try {
-      await axios.delete(`/api/skillPlan/delete-plan?skillPlanId=${skillPlanId}`, { withCredentials: true });
+      await api.delete(`/skillplans/c/${skillPlanId}delete-skill-plan`, { withCredentials: true });
       toast.success("Skill Plan deleted");
       router.push("/skillPlans");
     } catch (err) {
@@ -196,7 +196,7 @@ export default function SkillPlanDetailPage() {
   const createTopic = async () => {
     if (!skillPlan) return;
     try {
-      await axios.get(`/api/dailyTopic/create-topic?skillPlanId=${skillPlanId}&day=${skillPlan.currentDay}`, { withCredentials: true });
+      await api.get(`/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`, { withCredentials: true });
       toast.success("Today's topic generated");
       router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`);
     } catch (err) {

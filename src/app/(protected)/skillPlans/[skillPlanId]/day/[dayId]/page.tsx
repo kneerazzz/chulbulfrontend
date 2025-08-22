@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import DailyTopic from './topic-content';
 import Notes from './notes';
 import Actions from './actions';
-import axios from 'axios';
+import { api } from '@/lib/api';
 
 interface SkillPlanDetail {
   _id: string;
@@ -51,7 +51,7 @@ export default function DailySessionPage() {
     const fetchSkillPlan = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`/api/skillPlan/get-plan?skillPlanId=${skillPlanId}`);
+        const res = await api.get(`/skillplans/c/${skillPlanId}/get-skill-plan`);
         setSkillPlan(res.data.data);
       } catch (err) {
         console.error("Failed to fetch skill plan:", err);

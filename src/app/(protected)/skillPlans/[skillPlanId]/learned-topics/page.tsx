@@ -7,8 +7,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/app
 import { Badge } from "@/app/components/ui/badge";
 import { Loader2, ChevronLeft, BookOpen, Calendar, ArrowRight, AlertCircle, FileText } from "lucide-react";
 import { format } from "date-fns";
-import axios from "axios";
 import Link from "next/link";
+import { api } from "@/lib/api";
 
 interface Note {
   _id: string;
@@ -72,7 +72,7 @@ export default function LearnedTopicsPage() {
         setError("");
 
         // Fetch skill plan data which contains completed subtopics
-        const planRes = await axios.get(`/api/skillPlan/get-plan?skillPlanId=${skillPlanId}`, {
+        const planRes = await api.get(`/skillplans/c/${skillPlanId}/get-skill-plan`, {
           withCredentials: true
         });
 
@@ -85,7 +85,7 @@ export default function LearnedTopicsPage() {
             // Fetch all notes for this skill plan in a single request
             let allNotes: Note[] = [];
             try {
-              const notesRes = await axios.get(`/api/notes/get-all-notes?skillPlanId=${skillPlanId}`, {
+              const notesRes = await api.get(`/notes/c/${skillPlanId}/get-all-notes`, {
                 withCredentials: true
               });
               
@@ -124,7 +124,7 @@ export default function LearnedTopicsPage() {
           } else {
             // If no completed subtopics, try to fetch any existing notes
             try {
-              const notesRes = await axios.get(`/api/notes/get-all-notes/${skillPlanId}`, {
+              const notesRes = await api.get(`/notes/c/${skillPlanId}/get-all-notes`, {
                 withCredentials: true
               });
               

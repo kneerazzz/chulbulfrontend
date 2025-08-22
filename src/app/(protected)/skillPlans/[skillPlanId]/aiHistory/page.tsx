@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import axios from "axios";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/app/components/ui/card";
 import { Button } from "@/app/components/ui/button";
 import { Loader2, Calendar, Hash, Cpu, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/app/components/ui/badge";
+import { api } from "@/lib/api";
 
 interface GeneratedTopic {
   title: string;
@@ -40,7 +40,7 @@ export default function SkillPlanHistoryPage() {
     const fetchHistory = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`/api/aiHistory/get-ai-history?skillPlanId=${skillPlanId}`, {
+        const res = await api.get(`/aiHistory/get-ai-history?skillPlanId=${skillPlanId}`, {
           withCredentials: true,
         });
         setHistory(res.data.data || []);
@@ -57,7 +57,7 @@ export default function SkillPlanHistoryPage() {
   const clearHistory = async () => {
     setDeleting(true);
     try {
-      await axios.delete(`/api/aiHistory/delete-history?skillPlanId=${skillPlanId}`, {
+      await api.delete(`/aiHistory/c/${skillPlanId}/delete-ai-history`, {
         withCredentials: true,
       });
       setHistory([]);
@@ -73,7 +73,7 @@ export default function SkillPlanHistoryPage() {
     setDeletingId(id);
     try {
       // Fixed: Using query parameters as expected by your proxy route
-      await axios.delete(`/api/aiHistory/delete-single-log?skillPlanId=${skillPlanId}&id=${id}`, {
+      await api.delete(`/aiHistory/c/${skillPlanId}/delete-single-log?id=${id}`, {
         withCredentials: true,
       });
       setHistory(history.filter(item => item._id !== id));

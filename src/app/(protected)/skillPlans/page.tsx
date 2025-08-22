@@ -26,8 +26,8 @@ import {
   Pause,
 } from "lucide-react";
 import { format} from "date-fns";
-import axios from "axios";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 // Common interfaces
 interface Skill {
@@ -73,7 +73,7 @@ export default function SkillPlansOverview() {
   useEffect(() => {
     const fetchSkillPlans = async () => {
       try {
-        const res = await axios.get("/api/skillPlan/get-all-plan");
+        const res = await api.get("/skillplans/get-skill-plans");
         const response = res.data.data;
         console.log(response);
         setSkillPlans(response);
@@ -113,7 +113,7 @@ export default function SkillPlansOverview() {
 
   const togglePlanStatus = async (planId: string, currentStatus: boolean) => {
     try {
-      await axios.patch(`/api/skillPlan/toggle-status?skillPlanId=${planId}`, {
+      await api.patch(`/skillplans/toggle-status?skillPlanId=${planId}`, {
         isPaused: !currentStatus
       });
       
@@ -126,6 +126,7 @@ export default function SkillPlansOverview() {
     } catch (err) {
       console.error("Failed to toggle plan status:", err);
       toast.error("Failed to update plan status");
+      toast.message("It won't work - neeraj")
     }
   };
 
