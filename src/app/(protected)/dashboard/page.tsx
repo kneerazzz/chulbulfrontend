@@ -59,8 +59,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await axios.get('/api/get-all-skills', {withCredentials: true})
         //const res = await axios.get(`/api/dashboard`, { withCredentials: true })
+        const res = await api.get("/dashboard", {withCredentials: true})
         setData(res.data.data)
       } catch (err) {
         console.error('Error fetching dashboard:', err)
