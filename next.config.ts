@@ -1,11 +1,14 @@
-import { NextConfig } from "next";
+import type { NextConfig } from "next";
 
-const nextConfig = {
-  // Remove rewrites - use proxy routes instead
-  env: {
-    BACKEND_URL: process.env.BACKEND_URL,
-  }
+const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',                        // frontend route
+        destination: 'https://chulbulproject.onrender.com/api/v1/:path*', // backend URL
+      },
+    ]
+  },
 };
 
-
-export default nextConfig
+export default nextConfig;
