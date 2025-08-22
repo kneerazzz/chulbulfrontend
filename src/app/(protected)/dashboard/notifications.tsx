@@ -150,10 +150,6 @@ export default function NotificationDrawer({ open, onOpenChange }: NotificationD
     }
   };
 
-  if(open){
-    fetchNotifications()
-  }
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetTrigger asChild>
