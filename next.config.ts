@@ -1,11 +1,14 @@
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: `${process.env.BACKEND_URL}/:path*`
-      }
-    ];
-  }
+        source: '/api/:path*',                        // frontend route
+        destination: 'https://chulbulproject.onrender.com/api/v1/:path*', // backend URL
+      },
+    ]
+  },
 };
-module.exports = nextConfig;
+
+export default nextConfig;
