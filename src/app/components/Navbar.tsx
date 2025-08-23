@@ -197,7 +197,7 @@ const Navbar = () => {
                         </Link>
                       </Button>
                       <Button asChild variant="ghost" className="justify-start gap-3">
-                        <Link href="/skill-plans" onClick={() => setMobileMenuOpen(false)}>
+                        <Link href="/skillPlans" onClick={() => setMobileMenuOpen(false)}>
                           <BookOpen className="h-5 w-5" />
                           Skill Plans
                         </Link>
