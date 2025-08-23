@@ -69,16 +69,29 @@ export default function DailySessionPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="sticky top-0 z-10 bg-background border-b px-8 py-4">
+        {/* Loading Header */}
+        <div className="sticky top-0 z-10 bg-background border-b px-4 sm:px-8 py-4">
           <Skeleton className="h-8 w-64" />
         </div>
-        <div className="flex h-[calc(100vh-80px)] px-8">
-          <div className="w-[60%] pr-6">
-            <Skeleton className="h-full w-full rounded-lg" />
+        
+        {/* Loading Content */}
+        <div className="p-4 sm:p-8">
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex gap-6 h-[calc(100vh-120px)]">
+            <div className="w-[60%]">
+              <Skeleton className="h-full w-full rounded-lg" />
+            </div>
+            <div className="w-[30%] space-y-6">
+              <Skeleton className="h-1/2 w-full rounded-lg" />
+              <Skeleton className="h-1/2 w-full rounded-lg" />
+            </div>
           </div>
-          <div className="w-[30%] space-y-6">
-            <Skeleton className="h-1/2 w-full rounded-lg" />
-            <Skeleton className="h-1/2 w-full rounded-lg" />
+          
+          {/* Mobile Layout */}
+          <div className="lg:hidden space-y-6">
+            <Skeleton className="h-96 w-full rounded-lg" />
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <Skeleton className="h-32 w-full rounded-lg" />
           </div>
         </div>
       </div>
@@ -103,9 +116,9 @@ export default function DailySessionPage() {
   const isCompletedDay = skillPlan.completedDays.includes(day);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-background border-b px-8 py-4 flex-shrink-0">
+      <div className="sticky top-0 z-10 bg-background border-b px-4 sm:px-8 py-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Button
@@ -119,7 +132,7 @@ export default function DailySessionPage() {
             </Button>
             
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold">{skillPlan.skill.title}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">{skillPlan.skill.title}</h1>
               <p className="text-sm text-muted-foreground">{skillPlan.skill.category}</p>
             </div>
           </div>
@@ -145,12 +158,136 @@ export default function DailySessionPage() {
         </div>
       </div>
 
-      {/* Main Layout - Content Left, Notes & Actions Right */}
-      <div className="flex flex-1 overflow-hidden px-8">
-        {/* Content Section - 60% width, full height, scrollable */}
-        <div className="w-[60%] pr-6 overflow-y-auto">
-          <Card className="h-full flex flex-col">
-            <CardHeader className="flex-shrink-0">
+      {/* Main Content */}
+      <div className="p-4 sm:p-8">
+        
+        {/* Desktop Layout - Side by Side */}
+        <div className="hidden lg:flex h-[calc(100vh-120px)] px-[4%]">
+          {/* Content Section - 60% width */}
+          <div className="w-[60%] pr-[2%]">
+            <Card className="h-full flex flex-col">
+              <CardHeader className="flex-shrink-0">
+                <CardTitle className="flex items-center gap-2">
+                  Today&apos;s Content
+                </CardTitle>
+                <CardDescription>
+                  Study materials and resources for day {day}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-y-auto">
+                <Suspense fallback={
+                  <div className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                }>
+                  <DailyTopic
+                    skillPlanId={skillPlanId}
+                    day={day}
+                    currentDay={currentDay}
+                  />
+                </Suspense>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Sidebar - 30% width */}
+          <div className="w-[30%] space-y-6 overflow-y-auto">
+            {/* Notes Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Notes</CardTitle>
+                <CardDescription>
+                  Record your thoughts and key takeaways
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={
+                  <div className="space-y-3">
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                }>
+                  <Notes
+                    skillPlanId={skillPlanId}
+                    day={day}
+                    onNotesChange={setNotesContent}
+                    currentDay={currentDay}
+                  />
+                </Suspense>
+              </CardContent>
+            </Card>
+
+            {/* Actions Section */}
+            {isToday && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Session Actions</CardTitle>
+                  <CardDescription>
+                    Complete your daily session
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Actions
+                    skillPlanId={skillPlanId}
+                    day={day}
+                    currentDay={currentDay}
+                    notesContent={notesContent}
+                    onComplete={handleCompleteSuccess}
+                  />
+                </CardContent>
+              </Card>
+            )}
+
+            {(isPastDay || isCompletedDay) && (
+              <Card className="bg-muted/50 border-green-200">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-green-700">
+                    <CheckCircle className="h-5 w-5" />
+                    Day Completed
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground text-sm">
+                    This day has been completed. You can review the content and
+                    notes, but no further actions are available.
+                  </p>
+                  <Button
+                    onClick={() => router.push(`/skillPlans/${skillPlanId}`)}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    Return to Plan Overview
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {isFutureDay && (
+              <Card className="bg-muted/50 border-amber-200">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
+                    <Lock className="h-5 w-5" />
+                    Upcoming Day
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm">
+                    This day hasn&apos;t started yet. Complete the current day to
+                    unlock future sessions.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Layout - Single Column */}
+        <div className="lg:hidden space-y-6 max-h-[calc(100vh-120px)] overflow-y-auto">
+          {/* Content Section */}
+          <Card>
+            <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Today&apos;s Content
               </CardTitle>
@@ -158,7 +295,7 @@ export default function DailySessionPage() {
                 Study materials and resources for day {day}
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
+            <CardContent className="max-h-96 overflow-y-auto">
               <Suspense fallback={
                 <div className="space-y-3">
                   <Skeleton className="h-4 w-full" />
@@ -174,10 +311,7 @@ export default function DailySessionPage() {
               </Suspense>
             </CardContent>
           </Card>
-        </div>
 
-        {/* Right Side - Notes and Actions - 30% width */}
-        <div className="w-[30%] space-y-6 overflow-y-auto">
           {/* Notes Section */}
           <Card>
             <CardHeader>
@@ -249,7 +383,7 @@ export default function DailySessionPage() {
           )}
 
           {isFutureDay && (
-            <Card className="bg-muted/50 border-red-400">
+            <Card className="bg-muted/50 border-amber-200">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
                   <Lock className="h-5 w-5" />
@@ -257,7 +391,7 @@ export default function DailySessionPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-white text-xl font-semibold">
+                <p className="text-muted-foreground text-sm">
                   This day hasn&apos;t started yet. Complete the current day to
                   unlock future sessions.
                 </p>
