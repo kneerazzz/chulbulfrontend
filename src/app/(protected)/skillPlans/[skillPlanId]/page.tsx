@@ -75,6 +75,8 @@ export default function SkillPlanDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [progressPct, setProgressPct] = useState<number>(0);
+  const [topicReady, setTopicReady] = useState(false);
+  const [creatingTopic, setCreatingTopic] = useState(false);
 
   // Local reflections stored in localStorage to avoid backend coupling
   const [notesMap, setNotesMap] = useState<Record<number, string>>({});
@@ -198,18 +200,21 @@ export default function SkillPlanDetailPage() {
 
     const ensureTopic = async () => {
       try {
+        setCreatingTopic(true)
         const res = await api.get(
           `/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`,
           { withCredentials: true }
         );
-        if (res.data.statusCode === 200) {
+        if (res.data.success) {
           toast.success("Today's topic ready");
+          setTopicReady(true)
         }
       } catch (err) {
         console.error(err);
         toast.error("Failed to load today's topic");
       } finally {
-        setLoading(false);
+        setCreatingTopic(false);
+        setLoading(false)
       }
     };
 
@@ -456,11 +461,12 @@ export default function SkillPlanDetailPage() {
                           } catch (error) {
                             toast.error("Error loading today's content")   
                           }
-                        }} className="flex flex-col items-center gap-1 group">
+                        }} className="flex flex-col items-center gap-1 group" disabled={!topicReady || creatingTopic}>
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white text-black font-semibold group-hover:opacity-90 transition">
-                            {day}
+                            {creatingTopic ? <Loader2 className="h-2 w-2 animate-spin" /> : `${day}`}
                           </div>
                           <span className="text-xs text-white/90 font-medium">Today</span>
+
                         </button>
                       );
                     }
@@ -560,17 +566,12 @@ export default function SkillPlanDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <Button
-                    className="w-full gap-2 bg-white text-black hover:bg-gray-100 cursor-pointer"
-                    onClick={async () => {
-                      try {
-                        router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`);
-                      } catch {
-                        toast.error("Could not start today's topic");
-                      }
-                    }}
-                    disabled={loading}
+                    className="w-full gap-2 bg-white text-black hover:bg-gray-100"
+                    onClick={() => router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`)}
+                    disabled={!topicReady || creatingTopic}
                   >
-                    <Play className="h-4 w-4" /> Start Day {skillPlan.currentDay}
+                    {creatingTopic ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                    {creatingTopic ? "Preparing topic..." : `Start Day ${skillPlan.currentDay}`}
                   </Button>
                 </CardContent>
               </Card>
