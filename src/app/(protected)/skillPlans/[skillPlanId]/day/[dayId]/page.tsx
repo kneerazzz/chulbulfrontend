@@ -205,7 +205,7 @@ export default function DailySessionPage() {
 
           {/* Actions Section */}
           {isToday && (
-            <Card className="h-1/2">
+            <Card className="h-[40%] pb-4">
               <CardHeader>
                 <CardTitle className="text-lg">Session Actions</CardTitle>
                 <CardDescription>
@@ -225,7 +225,7 @@ export default function DailySessionPage() {
           )}
 
           {(isPastDay || isCompletedDay) && (
-            <Card className="bg-muted/50 border-green-200 h-1/2">
+            <Card className="bg-muted/50 border-green-200 h-1/3">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-green-700">
                   <CheckCircle className="h-5 w-5" />
@@ -249,7 +249,7 @@ export default function DailySessionPage() {
           )}
 
           {isFutureDay && (
-            <Card className="bg-amber-50 border-amber-200 h-1/2">
+            <Card className="bg-gray-600 border-red-400 h-1/3">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
                   <Lock className="h-5 w-5" />
@@ -257,7 +257,7 @@ export default function DailySessionPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-amber-700 text-sm">
+                <p className="text-white-700 font-semibold text-xl">
                   This day hasn&apos;t started yet. Complete the current day to
                   unlock future sessions.
                 </p>
