@@ -390,9 +390,9 @@ const Dashboard = () => {
                     <div className="text-center py-8">
                       <BrainCircuit className="h-12 w-12 text-gray-500 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-white mb-2">No skill plans yet</h3>
-                      <p className="text-gray-400 mb-4">Create your first skill plan to start tracking your progress</p>
+                      <p className="text-gray-400 mb-4">Create your first skill to start tracking your progress</p>
                       <Button 
-                        onClick={() => router.push("/skillPlans/create")}
+                        onClick={() => router.push("/skills/new")}
                         className="bg-white text-black hover:bg-gray-100"
                       >
                         <PlusCircle className="h-4 w-4 mr-2" /> Create Plan
