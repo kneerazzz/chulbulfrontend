@@ -148,7 +148,7 @@ export default function DailySessionPage() {
       {/* Main Layout - Content Left, Notes & Actions Right */}
       <div className="flex h-[calc(100vh-80px)]">
         {/* Content Section - 40% width, full height, scrollable */}
-        <div className="w-[40%] p-6">
+        <div className="w-[55%] ml-[8%] p-6">
           <Card className="h-full flex flex-col">
             <CardHeader className="flex-shrink-0">
               <CardTitle className="flex items-center gap-2">
@@ -177,7 +177,7 @@ export default function DailySessionPage() {
         </div>
 
         {/* Right Side - Notes and Actions - 30% width */}
-        <div className="w-[30%] p-6 space-y-6">
+        <div className="w-[25%] mr-[8%] p-6 space-y-6">
           {/* Notes Section */}
           <Card>
             <CardHeader>
