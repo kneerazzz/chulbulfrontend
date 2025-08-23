@@ -72,13 +72,13 @@ export default function DailySessionPage() {
         <div className="sticky top-0 z-10 bg-background border-b px-8 py-4">
           <Skeleton className="h-8 w-64" />
         </div>
-        <div className="flex h-[calc(100vh-80px)]">
-          <div className="w-[40%] p-4">
+        <div className="flex h-[calc(100vh-80px)] px-8">
+          <div className="w-[60%] pr-6">
             <Skeleton className="h-full w-full rounded-lg" />
           </div>
-          <div className="w-[30%] p-4 space-y-4">
-            <Skeleton className="h-64 w-full rounded-lg" />
-            <Skeleton className="h-32 w-full rounded-lg" />
+          <div className="w-[30%] space-y-6">
+            <Skeleton className="h-1/2 w-full rounded-lg" />
+            <Skeleton className="h-1/2 w-full rounded-lg" />
           </div>
         </div>
       </div>
@@ -146,9 +146,9 @@ export default function DailySessionPage() {
       </div>
 
       {/* Main Layout - Content Left, Notes & Actions Right */}
-      <div className="flex h-[calc(100vh-80px)]">
-        {/* Content Section - 40% width, full height, scrollable */}
-        <div className="w-[55%] ml-[8%] p-6">
+      <div className="flex h-[calc(100vh-80px)] px-8">
+        {/* Content Section - 60% width, full height, scrollable */}
+        <div className="w-[60%] pr-6">
           <Card className="h-full flex flex-col">
             <CardHeader className="flex-shrink-0">
               <CardTitle className="flex items-center gap-2">
@@ -177,16 +177,16 @@ export default function DailySessionPage() {
         </div>
 
         {/* Right Side - Notes and Actions - 30% width */}
-        <div className="w-[25%] mr-[8%] p-6 space-y-6">
+        <div className="w-[30%] space-y-6">
           {/* Notes Section */}
-          <Card>
+          <Card className="h-1/2">
             <CardHeader>
               <CardTitle>Your Notes</CardTitle>
               <CardDescription>
                 Record your thoughts and key takeaways
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="h-[calc(100%-80px)]">
               <Suspense fallback={
                 <div className="space-y-3">
                   <Skeleton className="h-5 w-24" />
@@ -205,7 +205,7 @@ export default function DailySessionPage() {
 
           {/* Actions Section */}
           {isToday && (
-            <Card>
+            <Card className="h-1/2">
               <CardHeader>
                 <CardTitle className="text-lg">Session Actions</CardTitle>
                 <CardDescription>
@@ -225,7 +225,7 @@ export default function DailySessionPage() {
           )}
 
           {(isPastDay || isCompletedDay) && (
-            <Card className="bg-muted/50 border-green-200">
+            <Card className="bg-muted/50 border-green-200 h-1/2">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-green-700">
                   <CheckCircle className="h-5 w-5" />
@@ -249,7 +249,7 @@ export default function DailySessionPage() {
           )}
 
           {isFutureDay && (
-            <Card className="bg-amber-50 border-amber-200">
+            <Card className="bg-amber-50 border-amber-200 h-1/2">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
                   <Lock className="h-5 w-5" />
@@ -265,9 +265,6 @@ export default function DailySessionPage() {
             </Card>
           )}
         </div>
-
-        {/* Empty space on the right - 30% width for margin */}
-        <div className="w-[30%]"></div>
       </div>
     </div>
   );
