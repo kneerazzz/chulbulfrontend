@@ -158,7 +158,7 @@ export default function DailySessionPage() {
                 Study materials and resources for day {day}
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1">
+            <CardContent className="flex-1 overflow-y-auto">
               <Suspense fallback={
                 <div className="space-y-3">
                   <Skeleton className="h-4 w-full" />
