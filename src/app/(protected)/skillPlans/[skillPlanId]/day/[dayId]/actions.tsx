@@ -37,7 +37,7 @@ export default function SessionActions({
         `/skillplans/c/${skillPlanId}/complete-current-day`,
         { withCredentials: true }
       );
-      if (res.status === 200) {
+      if (res.data.success) {
         toast.success(`Day ${day} completed successfully!`);
         if (onComplete) onComplete();
         setIsNavigating(true);

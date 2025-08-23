@@ -36,7 +36,9 @@ export default function EditProfile({ user }: { user: any }) {
       };
 
       const res = await api.patch(`/users/update-details`, payload, {withCredentials: true});
-      if (res.data.statusCode !== 200) throw new Error(await res.data.message);
+      if(!res.data.success){
+        toast.error(res.data.message ||"something went wrong.")
+      }
       toast.success("Profile updated successfully!!")
     } catch (err: any) {
       alert(err.message);

@@ -1,11 +1,12 @@
 // utils/authActions.ts
+import { api } from "@/lib/api";
 import { useAuth } from "@/store/auth";
 import axios from "axios";
 
 export async function logout() {
   try {
     // Call backend logout route (if you have refresh token invalidation)
-    await axios.post("/api/auth/logout", {} , {
+    await api.post("/users/logout", {} , {
       withCredentials: true
     })
   } catch (err) {

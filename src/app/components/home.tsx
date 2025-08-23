@@ -170,7 +170,7 @@ const FeaturesSection = () => {
     {
       icon: <Users className="text-2xl text-orange-400" />,
       title: 'Community Learning',
-      description: 'Join study groups, compete with friends, and learn from a global community of learners.',
+      description: 'Join study groups, compete with friends, and learn from a global community of learners.(Fake)',
       stats: '1+ active learners',
       color: 'from-orange-500/20 to-orange-600/20 border-orange-500/30'
     }
@@ -182,16 +182,15 @@ const FeaturesSection = () => {
     { icon: <Calendar className="h-5 w-5 text-blue-400" />, title: 'Smart Scheduling', description: 'AI optimizes your study time' },
     { icon: <BarChart3 className="h-5 w-5 text-green-400" />, title: 'Analytics Dashboard', description: 'Deep insights into your progress' },
     { icon: <Lightbulb className="h-5 w-5 text-purple-400" />, title: 'Daily Challenges', description: 'Fresh practice every day' },
-    { icon: <Globe className="h-5 w-5 text-cyan-400" />, title: 'Multi-language Support', description: 'Learn in your preferred language' }
   ]
 
   const skillCategories = [
-    { icon: <Code className="h-6 w-6" />, name: 'Programming', count: '150+ courses', color: 'text-blue-400' },
-    { icon: <Palette className="h-6 w-6" />, name: 'Design', count: '80+ courses', color: 'text-purple-400' },
-    { icon: <BarChart3 className="h-6 w-6" />, name: 'Business', count: '120+ courses', color: 'text-green-400' },
-    { icon: <Users className="h-6 w-6" />, name: 'Management', count: '90+ courses', color: 'text-orange-400' },
-    { icon: <Shield className="h-6 w-6" />, name: 'Cybersecurity', count: '70+ courses', color: 'text-red-400' },
-    { icon: <Globe className="h-6 w-6" />, name: 'Languages', count: '60+ courses', color: 'text-cyan-400' }
+    { icon: <Code className="h-6 w-6" />, name: 'Programming', count: '0 courses', color: 'text-blue-400' },
+    { icon: <Palette className="h-6 w-6" />, name: 'Design', count: '0 courses', color: 'text-purple-400' },
+    { icon: <BarChart3 className="h-6 w-6" />, name: 'Business', count: '0+ courses', color: 'text-green-400' },
+    { icon: <Users className="h-6 w-6" />, name: 'Management', count: '0+ courses', color: 'text-orange-400' },
+    { icon: <Shield className="h-6 w-6" />, name: 'Cybersecurity', count: '0+ courses', color: 'text-red-400' },
+    { icon: <Globe className="h-6 w-6" />, name: 'Languages', count: '0+ courses', color: 'text-cyan-400' }
   ]
 
   return (

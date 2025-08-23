@@ -193,17 +193,29 @@ export default function SkillPlanDetailPage() {
     }
   };
 
-  const createTopic = async () => {
+  useEffect(() => {
     if (!skillPlan) return;
-    try {
-      await api.get(`/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`, { withCredentials: true });
-      toast.success("Today's topic generated");
-      router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to create today's topic");
-    }
-  };
+
+    const ensureTopic = async () => {
+      try {
+        const res = await api.get(
+          `/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`,
+          { withCredentials: true }
+        );
+        if (res.data.statusCode === 200) {
+          toast.success("Today's topic ready");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load today's topic");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    ensureTopic();
+  }, [skillPlan, skillPlanId, router]);
+
 
   const sharePlan = async () => {
     try {
@@ -438,7 +450,13 @@ export default function SkillPlanDetailPage() {
 
                     if (isCurrent) {
                       return (
-                        <button key={day} onClick={createTopic} className="flex flex-col items-center gap-1 group">
+                        <button key={day} onClick={async() => {
+                          try {
+                            router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`)
+                          } catch (error) {
+                            toast.error("Error loading today's content")   
+                          }
+                        }} className="flex flex-col items-center gap-1 group">
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white text-black font-semibold group-hover:opacity-90 transition">
                             {day}
                           </div>
@@ -542,8 +560,14 @@ export default function SkillPlanDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <Button
-                    className="w-full gap-2 bg-white text-black hover:bg-gray-100"
-                    onClick={createTopic}
+                    className="w-full gap-2 bg-white text-black hover:bg-gray-100 cursor-pointer"
+                    onClick={async () => {
+                      try {
+                        router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`);
+                      } catch {
+                        toast.error("Could not start today's topic");
+                      }
+                    }}
                     disabled={loading}
                   >
                     <Play className="h-4 w-4" /> Start Day {skillPlan.currentDay}

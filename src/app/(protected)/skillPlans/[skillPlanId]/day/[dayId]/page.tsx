@@ -52,6 +52,9 @@ export default function DailySessionPage() {
       try {
         setLoading(true);
         const res = await api.get(`/skillplans/c/${skillPlanId}/get-skill-plan`);
+        if(!res.data.success){
+          toast.error(res.data.message ||"something went wrong.")
+        }
         setSkillPlan(res.data.data);
       } catch (err) {
         console.error("Failed to fetch skill plan:", err);

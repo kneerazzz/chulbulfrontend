@@ -52,7 +52,9 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
           withCredentials: true
         });
         
-        if (res.status !== 200) throw new Error('Failed to fetch topic');
+        if(!res.data.success){
+          toast.error(res.data.message ||"something went wrong.")
+        }
         const data = res.data.data;
         setTopic(data);
       } catch (err) {
@@ -72,7 +74,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
         withCredentials: true
       });
 
-      if (res.status !== 200) throw new Error('Failed to regenerate topic');
+      if (!res.data.success) throw new Error('Failed to regenerate topic');
       const newTopic = res.data.data;
       setTopic(newTopic);
       toast.success("Topic regenerated successfully");
@@ -90,8 +92,9 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
         withCredentials: true
       });
 
-      if (res.status !== 200) throw new Error('Failed to delete topic');
-      
+      if(!res.data.success){
+        toast.error(res.data.message ||"something went wrong.")
+      }
       toast.success("Topic deleted successfully");
       setTopic(null);
     } catch (err) {

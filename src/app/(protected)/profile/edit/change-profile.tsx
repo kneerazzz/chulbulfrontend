@@ -27,8 +27,8 @@ export default function ChangeProfilePic({ user }: { user: any }) {
 
             const res = await api.patch("/users/update-profile-pic", formData, {withCredentials: true});
 
-            if(res.data.statusCode !== 200){
-                console.error("Error uploading pic")
+            if(!res.data.success){
+              toast.error(res.data.message ||"something went wrong.")
             }
             setPreview(res.data.user); // backend returns { user: "cloudinary_url" }
             toast.success("Profile picture updated!");

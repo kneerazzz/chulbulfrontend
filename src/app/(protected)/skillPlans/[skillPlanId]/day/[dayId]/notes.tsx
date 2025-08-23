@@ -44,7 +44,7 @@ export default function Notes({
         { withCredentials: true }
       );
 
-      if (res.status === 200 && res.data.data) {
+      if (res.data.success && res.data.data) {
         const noteContent = res.data.data.content || '';
         setContent(noteContent);
         setOriginalContent(noteContent);
@@ -86,7 +86,7 @@ export default function Notes({
         { withCredentials: true }
       );
 
-      if (res.status === 200) {
+      if (res.data.success) {
         toast.success("Notes updated successfully");
         setNoteExists(true);
         setOriginalContent(content);
@@ -108,7 +108,7 @@ export default function Notes({
         { withCredentials: true }
       );
 
-      if (res.status === 200) {
+      if (res.data.success) {
         toast.success("Note created successfully");
         setNoteExists(true);
         setOriginalContent(content);
@@ -129,7 +129,7 @@ export default function Notes({
         { withCredentials: true }
       );
 
-      if (res.status === 200) {
+      if (res.data.success) {
         toast.success("Note deleted successfully");
         setContent('');
         setOriginalContent('');
