@@ -103,7 +103,7 @@ export default function DailySessionPage() {
   const isCompletedDay = skillPlan.completedDays.includes(day);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background mb-4">
       {/* Fixed Header */}
       <div className="sticky top-0 z-10 bg-background border-b px-8 py-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -146,7 +146,7 @@ export default function DailySessionPage() {
       </div>
 
       {/* Main Layout - Content Left, Notes & Actions Right */}
-      <div className="flex h-[calc(100vh-80px)] px-8">
+      <div className="flex h-[calc(100vh-80px)] px-8 mt-2">
         {/* Content Section - 60% width, full height, scrollable */}
         <div className="w-[60%] pr-6">
           <Card className="h-full flex flex-col">
