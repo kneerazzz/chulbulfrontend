@@ -195,33 +195,63 @@ export default function SkillPlanDetailPage() {
     }
   };
 
-  useEffect(() => {
-    if (!skillPlan) return;
 
-    const ensureTopic = async () => {
-      try {
-        setCreatingTopic(true)
-        const res = await api.get(
-          `/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`,
-          { withCredentials: true }
-        );
-        if (res.data.success) {
-          toast.success("Today's topic ready");
-          setTopicReady(true)
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load today's topic");
-      } finally {
-        setCreatingTopic(false);
-        setLoading(false)
+  const ensureTopic = async (): Promise<boolean> => {
+    try {
+      if (!skillPlan || !skillPlanId) {
+        toast.error("Skill plan not available");
+        return false;
       }
-    };
+      
+      setCreatingTopic(true);
+      const res = await api.get(
+        `/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`,
+        { withCredentials: true, timeout: 10000 } // Added timeout
+      );
+      
+      if (res.data.success) {
+        toast.success("Today's topic ready");
+        setTopicReady(true);
+        return true;
+      } else {
+        toast.error(res.data.message || "Failed to prepare topic");
+        return false;
+      }
+    } catch (err: any) {
+      console.error("Topic creation error:", err);
+      
+      if (err.code === 'ECONNABORTED') {
+        toast.error("Topic preparation timed out. Please try again.");
+      } else if (err.response?.status === 404) {
+        toast.error("Topic endpoint not found");
+      } else if (err.response?.status >= 500) {
+        toast.error("Server error while preparing topic");
+      } else {
+        toast.error("Failed to load today's topic");
+      }
+      
+      return false;
+    } finally {
+      setCreatingTopic(false);
+      // Don't setLoading(false) here as it might interfere with other loading states
+    }
+  };
 
-    ensureTopic();
-  }, [skillPlan, skillPlanId, router]);
-
-
+  // Usage in the button click handler:
+  const handleStartTodaySession = async () => {
+    try {
+      if(!skillPlan){
+        return null
+      }
+      const topicReady = await ensureTopic();
+      if (topicReady) {
+        router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`);
+      }
+    } catch (error: any) {
+      console.error("Error starting session:", error);
+      toast.error("Error loading today's content");
+    }
+  };
   const sharePlan = async () => {
     try {
       const url = typeof window !== "undefined" ? window.location.href : "";
@@ -455,13 +485,7 @@ export default function SkillPlanDetailPage() {
 
                     if (isCurrent) {
                       return (
-                        <button key={day} onClick={async() => {
-                          try {
-                            router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`)
-                          } catch (error) {
-                            toast.error("Error loading today's content")   
-                          }
-                        }} className="flex flex-col items-center gap-1 group" disabled={!topicReady || creatingTopic}>
+                        <button key={day} onClick={handleStartTodaySession} className="flex flex-col items-center gap-1 group" disabled={creatingTopic}>
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white text-black font-semibold group-hover:opacity-90 transition">
                             {creatingTopic ? <Loader2 className="h-2 w-2 animate-spin" /> : `${day}`}
                           </div>
@@ -567,8 +591,8 @@ export default function SkillPlanDetailPage() {
                 <CardContent>
                   <Button
                     className="w-full gap-2 bg-white text-black hover:bg-gray-100"
-                    onClick={() => router.push(`/skillPlans/${skillPlanId}/day/${skillPlan.currentDay}`)}
-                    disabled={!topicReady || creatingTopic}
+                    onClick={handleStartTodaySession}
+                    disabled={creatingTopic}
                   >
                     {creatingTopic ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
                     {creatingTopic ? "Preparing topic..." : `Start Day ${skillPlan.currentDay}`}

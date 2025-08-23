@@ -35,8 +35,7 @@ api.interceptors.response.use(
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
-          .then((token) => {
-            // re-run original request
+          .then(() => {
             return api(originalRequest);
           })
           .catch((err) => {

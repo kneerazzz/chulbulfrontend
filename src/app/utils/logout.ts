@@ -1,7 +1,6 @@
 // utils/authActions.ts
 import { api } from "@/lib/api";
 import { useAuth } from "@/store/auth";
-import axios from "axios";
 
 export async function logout() {
   try {

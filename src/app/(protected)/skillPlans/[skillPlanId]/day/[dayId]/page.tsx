@@ -136,7 +136,7 @@ export default function DailySessionPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  Today's Content
+                  Today&apos;s Content
                 </CardTitle>
                 <CardDescription>
                   Study materials and resources for day {day}

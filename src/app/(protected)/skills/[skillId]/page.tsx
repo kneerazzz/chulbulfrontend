@@ -43,8 +43,9 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       toast.success("Skill deleted successfully");
       router.push("/skills");
 
-    } catch (error) {
+    } catch (error: any) {
       setError("Failed to delete skill");
+      console.log(error)
       toast.error("Failed to delete skill");
     }
   }

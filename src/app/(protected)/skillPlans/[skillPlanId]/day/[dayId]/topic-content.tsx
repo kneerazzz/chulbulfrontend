@@ -251,7 +251,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
                   {children}
                 </blockquote>
               ),
-              code: ({node, className, children, ...props}: any) => {
+              code: ({className, children, ...props}: any) => {
                 const match = /language-(\w+)/.exec(className || '');
                 const inline = !match;
                 
