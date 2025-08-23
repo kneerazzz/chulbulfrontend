@@ -4,7 +4,7 @@ import axios, { AxiosError } from "axios";
 export const api = axios.create({
   baseURL: "https://chulbulproject.onrender.com/api/v1",
   withCredentials: true,
-  timeout: 5000,
+  timeout: 50001,
 });
 
 let isRefreshing = false;
