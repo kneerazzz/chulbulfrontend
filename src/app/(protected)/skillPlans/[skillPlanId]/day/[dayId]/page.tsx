@@ -103,9 +103,9 @@ export default function DailySessionPage() {
   const isCompletedDay = skillPlan.completedDays.includes(day);
 
   return (
-    <div className="min-h-screen bg-background mb-4">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Fixed Header */}
-      <div className="sticky top-0 z-10 bg-background border-b px-8 py-4">
+      <div className="sticky top-0 z-10 bg-background border-b px-8 py-4 flex-shrink-0">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Button
@@ -146,9 +146,9 @@ export default function DailySessionPage() {
       </div>
 
       {/* Main Layout - Content Left, Notes & Actions Right */}
-      <div className="flex h-[calc(100vh-80px)] px-8 mt-2">
+      <div className="flex flex-1 overflow-hidden px-8">
         {/* Content Section - 60% width, full height, scrollable */}
-        <div className="w-[60%] pr-6">
+        <div className="w-[60%] pr-6 overflow-y-auto">
           <Card className="h-full flex flex-col">
             <CardHeader className="flex-shrink-0">
               <CardTitle className="flex items-center gap-2">
@@ -158,7 +158,7 @@ export default function DailySessionPage() {
                 Study materials and resources for day {day}
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
+            <CardContent className="flex-1">
               <Suspense fallback={
                 <div className="space-y-3">
                   <Skeleton className="h-4 w-full" />
@@ -177,16 +177,16 @@ export default function DailySessionPage() {
         </div>
 
         {/* Right Side - Notes and Actions - 30% width */}
-        <div className="w-[30%] space-y-6">
+        <div className="w-[30%] space-y-6 overflow-y-auto">
           {/* Notes Section */}
-          <Card className="h-1/2">
+          <Card>
             <CardHeader>
               <CardTitle>Your Notes</CardTitle>
               <CardDescription>
                 Record your thoughts and key takeaways
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-[calc(100%-80px)]">
+            <CardContent>
               <Suspense fallback={
                 <div className="space-y-3">
                   <Skeleton className="h-5 w-24" />
@@ -205,7 +205,7 @@ export default function DailySessionPage() {
 
           {/* Actions Section */}
           {isToday && (
-            <Card className="h-[40%] pb-4">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Session Actions</CardTitle>
                 <CardDescription>
@@ -225,7 +225,7 @@ export default function DailySessionPage() {
           )}
 
           {(isPastDay || isCompletedDay) && (
-            <Card className="bg-muted/50 border-green-200 h-1/3">
+            <Card className="bg-muted/50 border-green-200">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-green-700">
                   <CheckCircle className="h-5 w-5" />
@@ -249,7 +249,7 @@ export default function DailySessionPage() {
           )}
 
           {isFutureDay && (
-            <Card className="bg-gray-600 border-red-400 h-1/3">
+            <Card className="bg-muted/50 border-red-400">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
                   <Lock className="h-5 w-5" />
@@ -257,7 +257,7 @@ export default function DailySessionPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-white-700 font-semibold text-xl">
+                <p className="text-white text-xl font-semibold">
                   This day hasn&apos;t started yet. Complete the current day to
                   unlock future sessions.
                 </p>
