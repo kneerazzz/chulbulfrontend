@@ -111,7 +111,7 @@ export default function EditSkillPlanPage() {
             priority: priority,
             estimatedHoursPerDay: estimatedHours
         };
-      await api.patch(`/skillplans/c/${skillPlanId}update-skill-plan`, updatedDetails);
+      await api.patch(`/skillplans/c/${skillPlanId}/update-skill-plan`, updatedDetails);
       
       toast.success("Skill plan updated successfully");
       router.push(`/skillPlans/${skillPlanId}`);
