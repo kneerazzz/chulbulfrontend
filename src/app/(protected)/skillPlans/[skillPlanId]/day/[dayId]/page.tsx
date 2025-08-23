@@ -1,19 +1,19 @@
 "use client";
 
-import { Suspense, useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent } from '@/app/components/ui/card';
-import { Skeleton } from '@/app/components/ui/skeleton';
-import { Button } from '@/app/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
-import Loading from './loading';
-import { toast } from 'sonner';
+import { Suspense, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
+import { Skeleton } from "@/app/components/ui/skeleton";
+import { Button } from "@/app/components/ui/button";
+import { ChevronLeft } from "lucide-react";
+import Loading from "./loading";
+import { toast } from "sonner";
 
 // Components
-import DailyTopic from './topic-content';
-import Notes from './notes';
-import Actions from './actions';
-import { api } from '@/lib/api';
+import DailyTopic from "./topic-content";
+import Notes from "./notes";
+import Actions from "./actions";
+import { api } from "@/lib/api";
 
 interface SkillPlanDetail {
   _id: string;
@@ -38,10 +38,10 @@ export default function DailySessionPage() {
   const router = useRouter();
   const skillPlanId = params.skillPlanId as string;
   const day = Number(params.dayId);
-  const [notesContent, setNotesContent] = useState('');
+  const [notesContent, setNotesContent] = useState("");
   const [skillPlan, setSkillPlan] = useState<SkillPlanDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const handleCompleteSuccess = () => {
     toast.success(`Day ${day} marked as complete!`);
     router.push(`/skillPlans/${skillPlanId}`);
@@ -52,8 +52,8 @@ export default function DailySessionPage() {
       try {
         setLoading(true);
         const res = await api.get(`/skillplans/c/${skillPlanId}/get-skill-plan`);
-        if(!res.data.success){
-          toast.error(res.data.message ||"something went wrong.")
+        if (!res.data.success) {
+          toast.error(res.data.message || "something went wrong.");
         }
         setSkillPlan(res.data.data);
       } catch (err) {
@@ -75,7 +75,7 @@ export default function DailySessionPage() {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <p className="text-red-500 mb-4">Skill plan not found</p>
-        <Button onClick={() => router.push('/skillPlans')}>
+        <Button onClick={() => router.push("/skillPlans")}>
           Back to All Plans
         </Button>
       </div>
@@ -100,7 +100,7 @@ export default function DailySessionPage() {
           <ChevronLeft className="h-4 w-4" />
           Back to Plan
         </Button>
-        
+
         {/* Status Badge */}
         <div className="text-sm text-muted-foreground">
           {isFutureDay && "🔒 Upcoming Day"}
@@ -110,57 +110,65 @@ export default function DailySessionPage() {
       </div>
 
       <Suspense fallback={<Loading />}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content */}
-          <div className="lg:col-span-2 space-y-6">
-            <Suspense fallback={
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <Skeleton className="h-6 w-40" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-24 w-full" />
-                </CardContent>
-              </Card>
-            }>
-              <DailyTopic skillPlanId={skillPlanId} day={day} currentDay={currentDay} />
-            </Suspense>
-
-            <Suspense fallback={
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <Skeleton className="h-5 w-24" />
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-24 w-full" />
-                </CardContent>
-              </Card>
-            }>
-              <Notes 
-                skillPlanId={skillPlanId} 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left side = Content */}
+          <div className="space-y-6">
+            <Suspense
+              fallback={
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      <Skeleton className="h-6 w-40" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-24 w-full" />
+                  </CardContent>
+                </Card>
+              }
+            >
+              <DailyTopic
+                skillPlanId={skillPlanId}
                 day={day}
-                onNotesChange={setNotesContent}
                 currentDay={currentDay}
               />
             </Suspense>
           </div>
 
-          {/* Sidebar */}
+          {/* Right side = Notes + Actions + Status */}
           <div className="space-y-6">
+            <Suspense
+              fallback={
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      <Skeleton className="h-5 w-24" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-24 w-full" />
+                  </CardContent>
+                </Card>
+              }
+            >
+              <Notes
+                skillPlanId={skillPlanId}
+                day={day}
+                onNotesChange={setNotesContent}
+                currentDay={currentDay}
+              />
+            </Suspense>
+
             {isToday && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Session Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Actions 
-                    skillPlanId={skillPlanId} 
+                  <Actions
+                    skillPlanId={skillPlanId}
                     day={day}
                     currentDay={currentDay}
                     notesContent={notesContent}
@@ -180,10 +188,10 @@ export default function DailySessionPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-muted-foreground text-sm">
-                    This day has been completed. You can review the content and notes, 
-                    but no further actions are available.
+                    This day has been completed. You can review the content and
+                    notes, but no further actions are available.
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => router.push(`/skillPlans/${skillPlanId}`)}
                     className="w-full"
                     variant="outline"
@@ -204,8 +212,8 @@ export default function DailySessionPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-amber-700 text-sm">
-                    This day hasn&apos;t started yet. Complete the current day to unlock 
-                    future sessions.
+                    This day hasn&apos;t started yet. Complete the current day to
+                    unlock future sessions.
                   </p>
                 </CardContent>
               </Card>
