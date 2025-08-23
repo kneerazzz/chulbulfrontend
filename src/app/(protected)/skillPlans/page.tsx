@@ -279,7 +279,7 @@ export default function SkillPlansOverview() {
           </div>
           
           <Button asChild className="bg-white text-black hover:bg-gray-100">
-            <Link href="/skillPlans/create" className="flex items-center gap-2">
+            <Link href="/skills" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               New Plan
             </Link>
@@ -425,7 +425,7 @@ export default function SkillPlansOverview() {
                         : "No paused plans found"}
               </p>
               <Button asChild className="bg-white text-black hover:bg-gray-100">
-                <Link href="/skillPlans/create">
+                <Link href="/skills">
                   Create New Plan
                 </Link>
               </Button>
