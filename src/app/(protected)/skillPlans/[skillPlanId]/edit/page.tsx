@@ -82,7 +82,7 @@ export default function EditSkillPlanPage() {
   useEffect(() => {
     const fetchSkillPlan = async () => {
       try {
-        const res = await api.get(`/skillplans/c/${skillPlanId}get-skill-plan`);
+        const res = await api.get(`/skillplans/c/${skillPlanId}/get-skill-plan`);
         const data = res.data.data;
         setSkillPlan(data);
         setDuration(data.durationInDays);

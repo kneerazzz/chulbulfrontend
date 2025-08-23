@@ -2,10 +2,10 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/app/components/ui/card";
 import { Skeleton } from "@/app/components/ui/skeleton";
 import { Button } from "@/app/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Calendar, Target, CheckCircle, Lock } from "lucide-react";
 import Loading from "./loading";
 import { toast } from "sonner";
 
@@ -89,82 +89,111 @@ export default function DailySessionPage() {
   const isCompletedDay = skillPlan.completedDays.includes(day);
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-6">
-      {/* Header with Back Button */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => router.push(`/skillPlans/${skillPlanId}`)}
-          className="gap-2"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Plan
-        </Button>
-
-        {/* Status Badge */}
-        <div className="text-sm text-muted-foreground">
-          {isFutureDay && "🔒 Upcoming Day"}
-          {isToday && "🎯 Current Day"}
-          {(isPastDay || isCompletedDay) && "✅ Completed Day"}
+    <div className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/skillPlans/${skillPlanId}`)}
+            className="gap-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Plan
+          </Button>
+          
+          <div className="flex flex-col">
+            <h1 className="text-2xl font-bold">{skillPlan.skill.title}</h1>
+            <p className="text-sm text-muted-foreground">{skillPlan.skill.category}</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-3 bg-muted px-3 py-2 rounded-lg">
+          {isFutureDay && <Lock className="h-4 w-4 text-amber-500" />}
+          {isToday && <Target className="h-4 w-4 text-blue-500" />}
+          {(isPastDay || isCompletedDay) && <CheckCircle className="h-4 w-4 text-green-500" />}
+          
+          <div className="text-sm">
+            {isFutureDay && "Upcoming Day"}
+            {isToday && "Current Day"}
+            {(isPastDay || isCompletedDay) && "Completed Day"}
+          </div>
+          
+          <div className="h-4 w-px bg-border mx-2"></div>
+          
+          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+            <Calendar className="h-3 w-3" />
+            <span>Day {day} of {skillPlan.durationInDays}</span>
+          </div>
         </div>
       </div>
 
       <Suspense fallback={<Loading />}>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left side = Content */}
-          <div className="space-y-6">
-            <Suspense
-              fallback={
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      <Skeleton className="h-6 w-40" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content Column - 2/3 width on large screens */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  Today's Content
+                </CardTitle>
+                <CardDescription>
+                  Study materials and resources for day {day}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={
+                  <div className="space-y-3">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-3/4" />
                     <Skeleton className="h-24 w-full" />
-                  </CardContent>
-                </Card>
-              }
-            >
-              <DailyTopic
-                skillPlanId={skillPlanId}
-                day={day}
-                currentDay={currentDay}
-              />
-            </Suspense>
+                  </div>
+                }>
+                  <DailyTopic
+                    skillPlanId={skillPlanId}
+                    day={day}
+                    currentDay={currentDay}
+                  />
+                </Suspense>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Right side = Notes + Actions + Status */}
+          {/* Sidebar Column - 1/3 width on large screens */}
           <div className="space-y-6">
-            <Suspense
-              fallback={
-                <Card>
-                  <CardHeader>
-                    <CardTitle>
-                      <Skeleton className="h-5 w-24" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Notes</CardTitle>
+                <CardDescription>
+                  Record your thoughts and key takeaways
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Suspense fallback={
+                  <div className="space-y-3">
+                    <Skeleton className="h-5 w-24" />
                     <Skeleton className="h-24 w-full" />
-                  </CardContent>
-                </Card>
-              }
-            >
-              <Notes
-                skillPlanId={skillPlanId}
-                day={day}
-                onNotesChange={setNotesContent}
-                currentDay={currentDay}
-              />
-            </Suspense>
+                  </div>
+                }>
+                  <Notes
+                    skillPlanId={skillPlanId}
+                    day={day}
+                    onNotesChange={setNotesContent}
+                    currentDay={currentDay}
+                  />
+                </Suspense>
+              </CardContent>
+            </Card>
 
+            {/* Status and Actions Section */}
             {isToday && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Session Actions</CardTitle>
+                  <CardDescription>
+                    Complete your daily session
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Actions
@@ -179,10 +208,10 @@ export default function DailySessionPage() {
             )}
 
             {(isPastDay || isCompletedDay) && (
-              <Card className="bg-muted/50">
+              <Card className="bg-muted/50 border-green-200">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <span className="text-green-600">✅</span>
+                  <CardTitle className="text-lg flex items-center gap-2 text-green-700">
+                    <CheckCircle className="h-5 w-5" />
                     Day Completed
                   </CardTitle>
                 </CardHeader>
@@ -205,8 +234,8 @@ export default function DailySessionPage() {
             {isFutureDay && (
               <Card className="bg-amber-50 border-amber-200">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <span className="text-amber-600">🔒</span>
+                  <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
+                    <Lock className="h-5 w-5" />
                     Upcoming Day
                   </CardTitle>
                 </CardHeader>
