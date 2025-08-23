@@ -54,7 +54,9 @@ export function AuthForm() {
     try {
       const res = await api.post("/users/register", data)
       const {user, accessToken, refreshToken} = res.data.data;
-
+      if(!res.data.success){
+        toast.error(res.data.message || "Something went wrong")
+      }
       toast.success("Account created successfully!", {
         description: `Welcome, ${user.fullname}! (${user.username})`
       });
