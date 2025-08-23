@@ -70,7 +70,7 @@ export default function DailyTopic({ skillPlanId, day, currentDay }: DailyTopicP
   const handleRegenerate = async () => {
     try {
       setRegenerating(true);
-      const res = await api.get(`/dailyTopics/c/${skillPlanId}/regenerate-topic`, {
+      const res = await api.get(`/dailyTopics/c/${skillPlanId}/regenrate-topic`, {
         withCredentials: true
       });
 
