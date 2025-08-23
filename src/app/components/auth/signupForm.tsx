@@ -21,7 +21,7 @@ import { useRouter } from 'next/navigation';
 
 const FormSchema = z.object({
   username: z.string().min(3, {
-    message: "Username must be at least 3 characters.",
+    message: "Username must be at least 4 characters.",
   }),
   fullname: z.string().min(2, {
     message: "Full name must be at least 2 characters.",
@@ -50,8 +50,6 @@ export function AuthForm() {
   });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("signup data", data)
-    console.log(form.formState.errors)
     setIsLoading(true);
     try {
       const res = await api.post("/users/register", data)
@@ -60,7 +58,6 @@ export function AuthForm() {
       toast.success("Account created successfully!", {
         description: `Welcome, ${user.fullname}! (${user.username})`
       });
-
       login(user, accessToken, refreshToken)
       router.push("/dashboard")
       
