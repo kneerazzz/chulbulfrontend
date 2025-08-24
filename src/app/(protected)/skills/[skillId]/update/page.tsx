@@ -43,7 +43,15 @@ import {
   Award,
   Star,
   History,
-  ArrowRight
+  ArrowRight,
+  Monitor, 
+  Server, 
+  Brain, 
+  Database, 
+  Cloud, 
+  Lock, 
+  Boxes, 
+  Sigma 
 } from "lucide-react";
 import { api } from "@/lib/api";
 
@@ -55,13 +63,13 @@ const UpdateSkillPage = () => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
-    level: "1",
+    level: "beginner",
     description: "",
   });
   const [originalData, setOriginalData] = useState({
     title: "",
     category: "",
-    level: "1",
+    level: "beginner",
     description: "",
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -69,78 +77,121 @@ const UpdateSkillPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [hasChanges, setHasChanges] = useState(false);
 
-  // Predefined categories with icons
+  // Updated categories to match create page exactly
   const skillCategories = [
     { 
-      value: "programming", 
-      label: "Programming", 
-      icon: Code, 
-      description: "Software development, coding languages, frameworks",
+      value: "frontend", 
+      label: "Frontend", 
+      icon: Monitor, 
+      description: "UI development, React, Next.js, styling frameworks", 
       color: "bg-blue-500/20 text-blue-400 border-blue-500/30"
     },
     { 
-      value: "design", 
-      label: "Design", 
-      icon: Palette, 
-      description: "UI/UX, graphic design, creative tools",
-      color: "bg-purple-500/20 text-purple-400 border-purple-500/30"
+      value: "backend", 
+      label: "Backend", 
+      icon: Server, 
+      description: "APIs, server-side logic, authentication, scalability", 
+      color: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30"
+    },
+    { 
+      value: "ai-ml", 
+      label: "AI & ML", 
+      icon: Brain, 
+      description: "Machine learning, AI models, data science", 
+      color: "bg-pink-500/20 text-pink-400 border-pink-500/30"
+    },
+    { 
+      value: "database", 
+      label: "Database", 
+      icon: Database, 
+      description: "SQL, NoSQL, optimization, data management", 
+      color: "bg-teal-500/20 text-teal-400 border-teal-500/30"
+    },
+    { 
+      value: "devops", 
+      label: "DevOps", 
+      icon: Cloud, 
+      description: "CI/CD, cloud platforms, automation, infrastructure", 
+      color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+    },
+    { 
+      value: "web3", 
+      label: "Web3", 
+      icon: Boxes, 
+      description: "Blockchain, smart contracts, decentralized apps", 
+      color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
     },
     { 
       value: "cybersecurity", 
       label: "Cybersecurity", 
-      icon: Shield, 
-      description: "Network security, ethical hacking, compliance",
+      icon: Lock, 
+      description: "Network security, ethical hacking, compliance", 
       color: "bg-red-500/20 text-red-400 border-red-500/30"
     },
     { 
-      value: "marketing", 
-      label: "Marketing", 
-      icon: TrendingUp, 
-      description: "Digital marketing, SEO, content strategy",
-      color: "bg-green-500/20 text-green-400 border-green-500/30"
-    },
-    { 
-      value: "management", 
-      label: "Management", 
-      icon: Users, 
-      description: "Leadership, project management, team building",
-      color: "bg-orange-500/20 text-orange-400 border-orange-500/30"
+      value: "system-design", 
+      label: "System Design", 
+      icon: Boxes, 
+      description: "Architecture, scalability, distributed systems", 
+      color: "bg-gray-500/20 text-gray-400 border-gray-500/30"
     },
     { 
       value: "languages", 
       label: "Languages", 
       icon: Globe, 
-      description: "Foreign languages, communication skills",
+      description: "Foreign languages, communication skills", 
       color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30"
     },
     { 
       value: "business", 
       label: "Business", 
       icon: Briefcase, 
-      description: "Strategy, finance, operations, consulting",
-      color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+      description: "Strategy, finance, operations, consulting", 
+      color: "bg-orange-500/20 text-orange-400 border-orange-500/30"
+    },
+    { 
+      value: "marketing", 
+      label: "Marketing", 
+      icon: TrendingUp, 
+      description: "Digital marketing, SEO, content strategy", 
+      color: "bg-green-500/20 text-green-400 border-green-500/30"
+    },
+    { 
+      value: "design", 
+      label: "Design", 
+      icon: Palette, 
+      description: "UI/UX, graphic design, creative tools", 
+      color: "bg-purple-500/20 text-purple-400 border-purple-500/30"
+    },
+    { 
+      value: "management", 
+      label: "Management", 
+      icon: Users, 
+      description: "Leadership, project management, team building", 
+      color: "bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30"
+    },
+    { 
+      value: "algorithm", 
+      label: "Algorithms", 
+      icon: Sigma, 
+      description: "Problem-solving, data structures, optimization", 
+      color: "bg-lime-500/20 text-lime-400 border-lime-500/30"
     },
     { 
       value: "other", 
       label: "Other", 
       icon: Award, 
-      description: "Specialized skills and expertise",
-      color: "bg-gray-500/20 text-gray-400 border-gray-500/30"
-    },
+      description: "Specialized skills and expertise", 
+      color: "bg-slate-500/20 text-slate-400 border-slate-500/30"
+    }
   ];
 
-  // Level descriptions
+  // Updated level descriptions to match create page
   const levelDescriptions = {
-    "1": "Just getting started, learning the basics",
-    "2": "Basic understanding, can perform simple tasks",
-    "3": "Comfortable with fundamentals",
-    "4": "Intermediate level, good working knowledge",
-    "5": "Solid intermediate skills",
-    "6": "Advanced intermediate, can handle complex tasks",
-    "7": "Advanced level, strong expertise",
-    "8": "Very advanced, can mentor others",
-    "9": "Expert level, industry recognition",
-    "10": "Master level, thought leader in the field"
+    "beginner": "Just getting started, learning the basics",
+    "intermediate": "Comfortable with fundamentals, can handle most tasks",
+    "advanced": "Strong expertise, can handle complex challenges",
+    "expert": "Master level, thought leader in the field"
   };
 
   // Fetch skill details
@@ -151,8 +202,8 @@ const UpdateSkillPage = () => {
           withCredentials: true,
         });
 
-        const { title, category, level = "1", description = "" } = response.data.data;
-        const skillData = { title, category, level: level.toString(), description };
+        const { title, category, level = "beginner", description = "" } = response.data.data;
+        const skillData = { title, category, level, description };
         
         setFormData(skillData);
         setOriginalData(skillData);
@@ -233,19 +284,22 @@ const UpdateSkillPage = () => {
   };
 
   const getLevelColor = (level: string) => {
-    const numLevel = parseInt(level);
-    if (numLevel <= 3) return "bg-red-500/20 text-red-400 border-red-500/30";
-    if (numLevel <= 6) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    if (numLevel <= 8) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-    return "bg-green-500/20 text-green-400 border-green-500/30";
+    switch (level) {
+      case "beginner":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "intermediate":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      case "advanced":
+        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      case "expert":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+    }
   };
 
-  const getLevelLabel = (level: string) => {
-    const numLevel = parseInt(level);
-    if (numLevel <= 3) return "Beginner";
-    if (numLevel <= 6) return "Intermediate";
-    if (numLevel <= 8) return "Advanced";
-    return "Expert";
+  const capitalizeLevel = (level: string) => {
+    return level.charAt(0).toUpperCase() + level.slice(1);
   };
 
   const getCategoryInfo = (category: string) => {
@@ -338,9 +392,9 @@ const UpdateSkillPage = () => {
                     <div className="p-3 bg-neutral-800 rounded-lg border border-neutral-700">
                       <div className="flex items-center gap-2">
                         <Badge className={`${getLevelColor(originalData.level)} border font-medium`}>
-                          {originalData.level}/10
+                          {capitalizeLevel(originalData.level)}
                         </Badge>
-                        <span className="text-white font-medium">{getLevelLabel(originalData.level)}</span>
+                        <span className="text-white font-medium">{levelDescriptions[originalData.level as keyof typeof levelDescriptions]}</span>
                       </div>
                     </div>
                   </div>
@@ -456,10 +510,9 @@ const UpdateSkillPage = () => {
                           <SelectItem key={level} value={level} className="text-white hover:bg-neutral-700">
                             <div className="flex items-center gap-3">
                               <Badge className={`${getLevelColor(level)} border font-medium`}>
-                                {level}/10
+                                {capitalizeLevel(level)}
                               </Badge>
                               <div>
-                                <span className="font-medium">{getLevelLabel(level)}</span>
                                 <p className="text-sm text-gray-400">{desc}</p>
                               </div>
                             </div>
@@ -472,7 +525,7 @@ const UpdateSkillPage = () => {
                       <div className="flex items-center gap-2 text-sm">
                         <ArrowRight className="h-3 w-3 text-gray-400" />
                         <span className="text-gray-500">
-                          Changed from: Level {originalData.level} ({getLevelLabel(originalData.level)})
+                          Changed from: {capitalizeLevel(originalData.level)}
                         </span>
                       </div>
                     )}
@@ -576,10 +629,10 @@ const UpdateSkillPage = () => {
                     <div className="p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
                       <p className="text-sm font-medium text-orange-400 mb-1">Level</p>
                       <p className="text-xs text-gray-400 line-through">
-                        {originalData.level}/10 ({getLevelLabel(originalData.level)})
+                        {capitalizeLevel(originalData.level)}
                       </p>
                       <p className="text-xs text-white">
-                        {formData.level}/10 ({getLevelLabel(formData.level)})
+                        {capitalizeLevel(formData.level)}
                       </p>
                     </div>
                   )}

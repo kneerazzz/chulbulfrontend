@@ -15,7 +15,6 @@ import {
   Plus, 
   BookOpen, 
   Target, 
-  Calendar, 
   TrendingUp,
   Loader2,
   AlertTriangle,
@@ -101,9 +100,6 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
     setActionLoading(true);
     
     try {
-      const resolvedParams = await params;
-      const { skillId } = resolvedParams;
-
       router.push(`/skillPlans/${skillPlan._id}`);
     } catch (error) {
       console.error("Error navigating to skill plan", error);
@@ -501,7 +497,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                 <CardContent className="space-y-4">
                   {/* Benefits */}
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium text-white">What you'll get:</h4>
+                    <h4 className="text-sm font-medium text-white">What you&apos;ll get:</h4>
                     <ul className="text-xs text-gray-400 space-y-1">
                       <li className="flex items-start gap-2">
                         <CheckCircle className="h-3 w-3 mt-0.5 text-green-400 flex-shrink-0" />
