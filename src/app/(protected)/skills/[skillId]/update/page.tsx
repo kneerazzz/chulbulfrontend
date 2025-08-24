@@ -527,6 +527,21 @@ const UpdateSkillPage = () => {
                       </div>
                     )}
                   </div>
+
+                  <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Brain className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="text-blue-400 font-medium mb-1">AI-Powered Skill Analysis</h4>
+                        <p className="text-sm text-gray-300">
+                          Our AI will automatically generate a detailed description for your skill and determine 
+                          an appropriate proficiency level based on your skill title and category. You can always 
+                          edit these later if needed.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
                   {/* Submit Buttons */}
                   <div className="flex justify-between pt-6 border-t border-neutral-800">
                     <div className="flex gap-3">
