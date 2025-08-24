@@ -499,12 +499,11 @@ const CtaSection = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="flex-1 px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
             />
-            <button className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 justify-center">
+            <button onClick={() => router.push("/dashboard")} className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center gap-2 justify-center">
               <Rocket className="h-5 w-5" />
               Get Started Free
             </button>
           </div>
-            <p className='text-white font-bold text-xl mb-4'>It won&apos;t do Shii. Maybe i will add functionality later</p>
           {/* Benefits */}
           <div className="flex flex-wrap justify-center gap-6 mb-12">
             {benefits.map((benefit, index) => (
