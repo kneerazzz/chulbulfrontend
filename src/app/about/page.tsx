@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/app/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
+import { Card, CardContent } from "@/app/components/ui/card";
 import { Badge } from "@/app/components/ui/badge";
 import { 
   Target, 
@@ -14,7 +14,6 @@ import {
   ArrowRight,
   Mail,
   Github,
-  Twitter,
   Zap,
   Award,
   BookOpen,
@@ -199,7 +198,7 @@ export default function AboutPage() {
         {/* Who It's For */}
         <section className="space-y-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Who It's For</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">Who It&apos;s For</h2>
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Perfect for anyone who wants to structure their learning and see tangible progress
             </p>
@@ -280,7 +279,7 @@ export default function AboutPage() {
               <Mail className="h-12 w-12 text-blue-400 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-white mb-4">Get in Touch</h2>
               <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                Have questions, suggestions, or found a bug? We'd love to hear from you!
+                Have questions, suggestions, or found a bug? We&apos;d love to hear from you!
               </p>
               
               <div className="flex justify-center gap-6">

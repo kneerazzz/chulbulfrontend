@@ -12,13 +12,6 @@ import {
   CardContent,
   CardDescription,
 } from "@/app/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/app/components/ui/select";
 import { Badge } from "@/app/components/ui/badge";
 import { 
   Loader2, 
@@ -186,13 +179,6 @@ const NewSkillPage = () => {
     setFormData((prev) => ({
       ...prev,
       category: category,
-    }));
-  };
-
-  const handleLevelSelect = (level: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      level: level,
     }));
   };
 
@@ -427,7 +413,7 @@ const NewSkillPage = () => {
               <CardContent className="space-y-3 text-sm text-gray-400">
                 <div className="flex gap-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <p>Be specific with skill names for better AI analysis (e.g., "React Development" vs "Programming")</p>
+                  <p>Be specific with skill names for better AI analysis (e.g., &quot;React Development&quot; vs &quot;Programming&quot;)</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
