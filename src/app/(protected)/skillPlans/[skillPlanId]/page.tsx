@@ -75,7 +75,6 @@ export default function SkillPlanDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [progressPct, setProgressPct] = useState<number>(0);
-  const [topicReady, setTopicReady] = useState(false);
   const [creatingTopic, setCreatingTopic] = useState(false);
 
   // Local reflections stored in localStorage to avoid backend coupling
@@ -211,7 +210,6 @@ export default function SkillPlanDetailPage() {
       
       if (res.data.success) {
         toast.success("Today's topic ready");
-        setTopicReady(true);
         return true;
       } else {
         toast.error(res.data.message || "Failed to prepare topic");

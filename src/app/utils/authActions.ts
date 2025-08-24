@@ -13,8 +13,8 @@ export async function syncAuthState() {
       // no user found → clear auth state
       useAuth.getState().logout();
     }
-  } catch (err) {
-    // request failed → treat as invalid session
+  } catch (err: any) {
+    console.error(err)
     useAuth.getState().logout();
   }
 }

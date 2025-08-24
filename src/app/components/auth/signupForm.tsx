@@ -53,14 +53,14 @@ export function AuthForm() {
     setIsLoading(true);
     try {
       const res = await api.post("/users/register", data)
-      const {user, accessToken, refreshToken} = res.data.data;
+      const {user} = res.data.data;
       if(!res.data.success){
         toast.error(res.data.message || "Something went wrong")
       }
       toast.success("Account created successfully!", {
         description: `Welcome, ${user.fullname}! (${user.username})`
       });
-      login(user, accessToken, refreshToken)
+      login(user)
       router.push("/dashboard")
       
       // Reset form after successful submission

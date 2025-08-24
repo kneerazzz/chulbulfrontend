@@ -50,7 +50,7 @@ api.interceptors.response.use(
 
       try {
         // Call your refresh endpoint
-        await api.post("/users/refresh-access-token", {}, {withCredentials: true});
+        await api.get("/users/refresh-access-token", {withCredentials: true});
 
         processQueue(null);
         return api(originalRequest); // retry original request
