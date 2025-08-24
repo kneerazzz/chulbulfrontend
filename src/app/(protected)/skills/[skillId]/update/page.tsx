@@ -7,7 +7,6 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
 import React from "react";
-import { Textarea } from "@/app/components/ui/textarea";
 import {
   Card,
   CardHeader,
@@ -33,9 +32,7 @@ import {
   Save,
   RotateCcw,
   AlertTriangle,
-  Code,
   Palette,
-  Shield,
   TrendingUp,
   Users,
   Globe,
@@ -530,30 +527,6 @@ const UpdateSkillPage = () => {
                       </div>
                     )}
                   </div>
-
-                  {/* Description */}
-                  <div className="space-y-3">
-                    <Label htmlFor="description" className="text-white font-medium flex items-center gap-2">
-                      <Lightbulb className="h-4 w-4 text-gray-400" />
-                      Description (Optional)
-                    </Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      placeholder="Describe your experience with this skill..."
-                      className="bg-neutral-800 border-neutral-700 text-white placeholder:text-gray-500 focus:border-neutral-600 min-h-[120px] resize-none"
-                      rows={5}
-                    />
-                    {formData.description !== originalData.description && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <ArrowRight className="h-3 w-3 text-gray-400" />
-                        <span className="text-gray-500">Description updated</span>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Submit Buttons */}
                   <div className="flex justify-between pt-6 border-t border-neutral-800">
                     <div className="flex gap-3">
