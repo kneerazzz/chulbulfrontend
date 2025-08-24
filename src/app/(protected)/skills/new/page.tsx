@@ -5,7 +5,6 @@ import { toast } from "sonner";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { Label } from "@/app/components/ui/label";
-import { Textarea } from "@/app/components/ui/textarea";
 import {
   Card,
   CardHeader,
@@ -52,14 +51,12 @@ const NewSkillPage = () => {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
-    level: "1",
-    description: "",
+    level: "beginner", // Changed to match backend enum
   });
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // Predefined categories with icons and descriptions
-
+  // Updated categories to match backend enums exactly
   const skillCategories = [
     { 
       value: "frontend", 
@@ -125,7 +122,7 @@ const NewSkillPage = () => {
       color: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30"
     },
     { 
-      value: "business",   // fixed typo (not "buisness")
+      value: "business", 
       label: "Business", 
       icon: Briefcase, 
       description: "Strategy, finance, operations, consulting", 
@@ -168,22 +165,15 @@ const NewSkillPage = () => {
     }
   ];
 
-
-  // Level descriptions
+  // Updated level descriptions to match backend enums
   const levelDescriptions = {
-    "1": "Just getting started, learning the basics",
-    "2": "Basic understanding, can perform simple tasks",
-    "3": "Comfortable with fundamentals",
-    "4": "Intermediate level, good working knowledge",
-    "5": "Solid intermediate skills",
-    "6": "Advanced intermediate, can handle complex tasks",
-    "7": "Advanced level, strong expertise",
-    "8": "Very advanced, can mentor others",
-    "9": "Expert level, industry recognition",
-    "10": "Master level, thought leader in the field"
+    "beginner": "Just getting started, learning the basics",
+    "intermediate": "Comfortable with fundamentals, can handle most tasks",
+    "advanced": "Strong expertise, can handle complex challenges",
+    "expert": "Master level, thought leader in the field"
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -222,9 +212,14 @@ const NewSkillPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post("/skills/create-skill", formData, {
+      // Only send title and category to backend - level and description are auto-generated
+      const response = await api.post("/skills/create-skill", {
+        title: formData.title.trim(),
+        category: formData.category
+      }, {
         withCredentials: true
       });
+      
       const { _id } = response.data.data;
       
       toast.success("Skill created successfully!");
@@ -237,19 +232,22 @@ const NewSkillPage = () => {
   };
 
   const getLevelColor = (level: string) => {
-    const numLevel = parseInt(level);
-    if (numLevel <= 3) return "bg-red-500/20 text-red-400 border-red-500/30";
-    if (numLevel <= 6) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    if (numLevel <= 8) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-    return "bg-green-500/20 text-green-400 border-green-500/30";
+    switch (level) {
+      case "beginner":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "intermediate":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      case "advanced":
+        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      case "expert":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+    }
   };
 
-  const getLevelLabel = (level: string) => {
-    const numLevel = parseInt(level);
-    if (numLevel <= 3) return "Beginner";
-    if (numLevel <= 6) return "Intermediate";
-    if (numLevel <= 8) return "Advanced";
-    return "Expert";
+  const capitalizeLevel = (level: string) => {
+    return level.charAt(0).toUpperCase() + level.slice(1);
   };
 
   return (
@@ -267,7 +265,7 @@ const NewSkillPage = () => {
           </Button>
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Create New Skill</h1>
-            <p className="text-gray-400 text-lg">Add a new skill to your portfolio and track your progress</p>
+            <p className="text-gray-400 text-lg">Add a new skill to your portfolio - AI will analyze and set the level for you</p>
           </div>
         </div>
 
@@ -281,7 +279,7 @@ const NewSkillPage = () => {
                   Skill Details
                 </CardTitle>
                 <CardDescription className="text-gray-400 text-base">
-                  Provide information about your skill and current proficiency level
+                  Provide your skill name and category. AI will generate the description and determine your level.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -339,58 +337,21 @@ const NewSkillPage = () => {
                         </p>
                       </div>
                     )}
-                    
-                    {/* Custom Category Input */}
-                    {selectedCategory === "other" && (
-                      <Input
-                        name="category"
-                        value={formData.category === "other" ? "" : formData.category}
-                        onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                        placeholder="Enter custom category"
-                        className="bg-neutral-800 border-neutral-700 text-white placeholder:text-gray-500 focus:border-neutral-600"
-                      />
-                    )}
                   </div>
 
-                  {/* Current Level */}
-                  <div className="space-y-4">
-                    <Label className="text-white font-medium flex items-center gap-2">
-                      <Star className="h-4 w-4 text-gray-400" />
-                      Current Proficiency Level
-                    </Label>
-                    <Select value={formData.level} onValueChange={handleLevelSelect}>
-                      <SelectTrigger className="bg-neutral-800 border-neutral-700 text-white h-12">
-                        <SelectValue placeholder="Select your current level" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-neutral-800 border-neutral-700">
-                        {Object.entries(levelDescriptions).map(([level, desc]) => (
-                          <SelectItem key={level} value={level} className="text-white hover:bg-neutral-700">
-                            <div className="flex items-center gap-3">
-                              <Badge className={`${getLevelColor(level)} border font-medium`}>
-                                {level}/10
-                              </Badge>
-                              <div>
-                                <span className="font-medium">{getLevelLabel(level)}</span>
-                                <p className="text-sm text-gray-400">{desc}</p>
-                              </div>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {formData.level && (
-                      <div className="p-4 bg-neutral-800 rounded-lg border border-neutral-700">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Badge className={`${getLevelColor(formData.level)} border font-medium`}>
-                            {formData.level}/10
-                          </Badge>
-                          <span className="text-white font-medium">{getLevelLabel(formData.level)}</span>
-                        </div>
-                        <p className="text-sm text-gray-400">
-                          {levelDescriptions[formData.level as keyof typeof levelDescriptions]}
+                  {/* Note about AI Generation */}
+                  <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <Brain className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="text-blue-400 font-medium mb-1">AI-Powered Skill Analysis</h4>
+                        <p className="text-sm text-gray-300">
+                          Our AI will automatically generate a detailed description for your skill and determine 
+                          an appropriate proficiency level based on your skill title and category. You can always 
+                          edit these later if needed.
                         </p>
                       </div>
-                    )}
+                    </div>
                   </div>
 
                   {/* Submit Buttons */}
@@ -420,7 +381,7 @@ const NewSkillPage = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Preview Card */}
-            {(formData.title || selectedCategory || formData.level !== "1") && (
+            {(formData.title || selectedCategory) && (
               <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-white">
@@ -440,22 +401,17 @@ const NewSkillPage = () => {
                     <div>
                       <p className="text-sm text-gray-400 mb-2">Category</p>
                       <Badge className="bg-neutral-800 text-gray-300 border-neutral-700">
-                        {skillCategories.find(cat => cat.value === selectedCategory)?.label || formData.category}
+                        {skillCategories.find(cat => cat.value === selectedCategory)?.label}
                       </Badge>
                     </div>
                   )}
                   
-                  {formData.level !== "1" && (
-                    <div>
-                      <p className="text-sm text-gray-400 mb-2">Level</p>
-                      <div className="flex items-center gap-2">
-                        <Badge className={`${getLevelColor(formData.level)} border font-medium`}>
-                          {formData.level}/10
-                        </Badge>
-                        <span className="text-sm text-gray-300">{getLevelLabel(formData.level)}</span>
-                      </div>
-                    </div>
-                  )}
+                  <div className="p-3 bg-neutral-800/50 rounded-lg border border-neutral-700">
+                    <p className="text-xs text-gray-500 mb-1">AI Generated</p>
+                    <p className="text-sm text-gray-400">
+                      Description and skill level will be automatically generated after creation
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -471,20 +427,40 @@ const NewSkillPage = () => {
               <CardContent className="space-y-3 text-sm text-gray-400">
                 <div className="flex gap-3">
                   <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <p>Be specific with skill names (e.g., &quot;React Development&quot; vs &quot;Programming&quot;)</p>
+                  <p>Be specific with skill names for better AI analysis (e.g., "React Development" vs "Programming")</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <p>Choose categories that best represent your skill domain</p>
+                  <p>Choose the most relevant category to help AI understand your skill domain</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <p>Be honest about your current level - you can always update it later</p>
+                  <p>AI will analyze your skill and set an appropriate proficiency level automatically</p>
                 </div>
                 <div className="flex gap-3">
                   <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <p>Add descriptions to provide context about your experience</p>
+                  <p>You can always edit the generated description and level after creation</p>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Available Levels Info */}
+            <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white text-sm">
+                  <Star className="h-4 w-4 text-gray-400" />
+                  Skill Levels
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {Object.entries(levelDescriptions).map(([level, desc]) => (
+                  <div key={level} className="flex items-start gap-3">
+                    <Badge className={`${getLevelColor(level)} border font-medium text-xs mt-0.5`}>
+                      {capitalizeLevel(level)}
+                    </Badge>
+                    <p className="text-xs text-gray-400 flex-1">{desc}</p>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>
