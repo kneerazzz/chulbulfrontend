@@ -56,9 +56,9 @@ export function LoginAuthForm() {
         password: data.password
       };
       const res = await api.post("/users/login", payload);
-      const {user, accessToken, refreshToken} = res.data.data
+      const { user } = res.data.data
 
-      login(user, accessToken, refreshToken)
+      login(user)
       router.push("/dashboard")
       toast.success("Login successful!", {
         description: `Welcome back, ${data.identifier}`,

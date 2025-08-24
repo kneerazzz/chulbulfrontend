@@ -1,11 +1,13 @@
 // lib/api.ts
 import axios, { AxiosError } from "axios";
-
+import { useAuth } from "@/store/auth";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const api = axios.create({
-  baseURL: "https://chulbulproject.onrender.com/api/v1",
+  baseURL: API_BASE_URL,
   withCredentials: true,
-  timeout: 50001,
+  timeout: 60000,
 });
+
 
 let isRefreshing = false;
 let failedQueue: any[] = [];
@@ -48,19 +50,21 @@ api.interceptors.response.use(
 
       try {
         // Call your refresh endpoint
-        await api.post("/users/refresh-access-token");
+        await api.post("/users/refresh-access-token", {}, {withCredentials: true});
 
         processQueue(null);
         return api(originalRequest); // retry original request
       } catch (refreshError) {
-        processQueue(refreshError, null);
+          processQueue(refreshError, null);
 
-        // If refresh fails, logout user
-        console.warn("Refresh token failed — redirecting to login");
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+          // If refresh fails, logout user
+          console.warn("Refresh token failed — redirecting to login");
+          useAuth.getState().logout(); // 👈 nuke Zustand here
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing: false
+        }
+
     }
 
     return Promise.reject(error);

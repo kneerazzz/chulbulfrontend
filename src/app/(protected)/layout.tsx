@@ -4,25 +4,28 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "../components/loader";
 import { useAuth } from "@/store/auth";
+import { syncAuthState } from "../utils/authActions";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [hydrated, setHydrated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Ensure Zustand store is ready
   useEffect(() => {
-    setHydrated(true);
+    const init = async () => {
+      await syncAuthState(); // ✅ hydrate Zustand from server
+      setLoading(false);
+    };
+    init();
   }, []);
 
   useEffect(() => {
-    if (hydrated && !isAuthenticated) {
-      router.replace("/login"); // replace so back button won’t keep looping
+    if (!loading && !isAuthenticated) {
+      router.replace("/login"); 
     }
-  }, [hydrated, isAuthenticated, router]);
+  }, [loading, isAuthenticated, router]);
 
-  if (!hydrated) return <Loader />;
-  if (!isAuthenticated) return <Loader />; // still redirecting
+  if (loading) return <Loader />;
 
   return <>{children}</>;
 }

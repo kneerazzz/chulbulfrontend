@@ -3,9 +3,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-/**
- * Get the access token from cookies - returns null if not found
- */
+
 export async function getAccessToken(): Promise<string | null> {
   try {
     const cookieStore = await cookies();
@@ -16,10 +14,6 @@ export async function getAccessToken(): Promise<string | null> {
     return null;
   }
 }
-
-/**
- * FIXED: Check auth but don't return NextResponse - let caller handle it
- */
 export async function requireAuth(): Promise<string | null> {
   const token = await getAccessToken();
   

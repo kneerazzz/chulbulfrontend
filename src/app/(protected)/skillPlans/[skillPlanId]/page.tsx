@@ -206,7 +206,7 @@ export default function SkillPlanDetailPage() {
       setCreatingTopic(true);
       const res = await api.get(
         `/dailyTopics/c/${skillPlanId}/create-topic?day=${skillPlan.currentDay}`,
-        { withCredentials: true, timeout: 10000 } // Added timeout
+        { withCredentials: true, timeout: 60000 } // Added timeout
       );
       
       if (res.data.success) {

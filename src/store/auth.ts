@@ -12,10 +12,8 @@ type User = {
 
 type AuthStore = {
     user: User | null;
-    accessToken: string | null;
-    refreshToken: string | null;
     isAuthenticated: boolean;
-    login: (user: User, accessToken: string, refreshToken?: string) => void;
+    login: (user: User) => void;
     logout: () => void;
 }
 
@@ -28,11 +26,9 @@ export const useAuth = create<AuthStore>()(
             refreshToken: null,
             isAuthenticated: false,
 
-            login: (user, accessToken, refreshToken) => {
+            login: (user) => {
                 set({
                     user,
-                    accessToken,
-                    refreshToken: refreshToken || null,
                     isAuthenticated: true
                 })
             },
@@ -40,14 +36,13 @@ export const useAuth = create<AuthStore>()(
             logout: () =>(
                 set({
                     user: null,
-                    accessToken: null,
-                    refreshToken: null,
                     isAuthenticated: false
                 })
             ),
         }),
         {
             name: "auth-storage",
+            skipHydration: true
         }
     )
 )
