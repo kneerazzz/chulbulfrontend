@@ -1,13 +1,13 @@
-// lib/api.ts
 import axios, { AxiosError } from "axios";
 import { useAuth } from "@/store/auth";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
   timeout: 60000,
 });
-
 
 let isRefreshing = false;
 let failedQueue: any[] = [];
@@ -32,6 +32,13 @@ api.interceptors.response.use(
 
     // If request failed with 401 (unauthorized)
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't retry if this IS the refresh request that failed
+      if (originalRequest.url?.includes('/refresh-access-token')) {
+        console.warn("Refresh token request failed - user needs to login");
+        useAuth.getState().logout();
+        return Promise.reject(error);
+      }
+
       if (isRefreshing) {
         // Wait until refresh finishes
         return new Promise(function (resolve, reject) {
@@ -50,23 +57,31 @@ api.interceptors.response.use(
 
       try {
         // Call your refresh endpoint
-        await api.get("/users/refresh-access-token", {withCredentials: true});
+        const refreshResponse = await api.get("/users/refresh-access-token", {
+          withCredentials: true,
+        });
 
-        processQueue(null);
-        return api(originalRequest); // retry original request
-      } catch (refreshError) {
-          processQueue(refreshError, null);
-
-          // If refresh fails, logout user
-          console.warn("Refresh token failed — redirecting to login");
-          useAuth.getState().logout(); // 👈 nuke Zustand here
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing: false
+        // Check if refresh was actually successful
+        if (refreshResponse.status === 200) {
+          processQueue(null);
+          return api(originalRequest); // retry original request
+        } else {
+          throw new Error("Refresh failed");
         }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
 
+        // If refresh fails, logout user
+        console.warn("Refresh token failed — redirecting to login");
+        useAuth.getState().logout();
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false; // Fix: was using colon instead of equals
+      }
     }
 
     return Promise.reject(error);
   }
 );
+
+export default api;
