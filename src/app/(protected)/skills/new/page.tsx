@@ -393,26 +393,6 @@ const NewSkillPage = () => {
                     )}
                   </div>
 
-                  {/* Description */}
-                  <div className="space-y-3">
-                    <Label htmlFor="description" className="text-white font-medium flex items-center gap-2">
-                      <Lightbulb className="h-4 w-4 text-gray-400" />
-                      Description (Optional)
-                    </Label>
-                    <Textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleChange}
-                      placeholder="Describe your experience with this skill, specific technologies you've worked with, projects you've completed, or goals you have..."
-                      className="bg-neutral-800 border-neutral-700 text-white placeholder:text-gray-500 focus:border-neutral-600 min-h-[120px] resize-none"
-                      rows={5}
-                    />
-                    <p className="text-sm text-gray-500">
-                      Help others understand your background and expertise in this skill
-                    </p>
-                  </div>
-
                   {/* Submit Buttons */}
                   <div className="flex justify-end gap-4 pt-6 border-t border-neutral-800">
                     <Button

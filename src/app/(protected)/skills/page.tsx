@@ -51,33 +51,58 @@ export default function SkillsPage() {
     ? skills 
     : skills.filter(skill => skill.category === selectedCategory);
 
-  // Helper function to convert level to number safely
-  const getLevelAsNumber = (level: string | number): number => {
-    return typeof level === 'string' ? parseInt(level) || 0 : level;
+  // Helper function to convert level to number for calculations
+  const getLevelAsNumber = (level: string): number => {
+    switch (level.toLowerCase()) {
+      case "beginner":
+        return 1;
+      case "intermediate":
+        return 2;
+      case "advanced":
+        return 3;
+      case "expert":
+        return 4;
+      default:
+        return 1;
+    }
   };
 
   // Get level color for badges
-  const getLevelColor = (level: string | number) => {
-    const numLevel = getLevelAsNumber(level);
-    if (numLevel <= 3) return "bg-red-500/20 text-red-400 border-red-500/30";
-    if (numLevel <= 6) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-    if (numLevel <= 8) return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-    return "bg-green-500/20 text-green-400 border-green-500/30";
+  const getLevelColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case "beginner":
+        return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "intermediate":
+        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+      case "advanced":
+        return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+      case "expert":
+        return "bg-green-500/20 text-green-400 border-green-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-400 border-gray-500/30";
+    }
   };
 
-  const getLevelLabel = (level: string | number) => {
-    const numLevel = getLevelAsNumber(level);
-    if (numLevel <= 3) return "Beginner";
-    if (numLevel <= 6) return "Intermediate";
-    if (numLevel <= 8) return "Advanced";
+  const capitalizeLevel = (level: string) => {
+    return level.charAt(0).toUpperCase() + level.slice(1);
+  };
+
+  // Calculate average level
+  const calculateAverageLevel = () => {
+    if (skills.length === 0) return "N/A";
+    const total = skills.reduce((acc, skill) => acc + getLevelAsNumber(skill.level), 0);
+    const average = total / skills.length;
+    
+    // Convert back to level name
+    if (average <= 1.5) return "Beginner";
+    if (average <= 2.5) return "Intermediate";
+    if (average <= 3.5) return "Advanced";
     return "Expert";
   };
 
-  // Calculate average level safely
-  const calculateAverageLevel = () => {
-    if (skills.length === 0) return 0;
-    const total = skills.reduce((acc, skill) => acc + getLevelAsNumber(skill.level), 0);
-    return Math.round(total / skills.length);
+  // Get level progress percentage (out of 4 levels)
+  const getLevelProgress = (level: string): number => {
+    return (getLevelAsNumber(level) / 4) * 100;
   };
 
   return (
@@ -147,8 +172,8 @@ export default function SkillsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-gray-400 mb-1">Avg Level</p>
-                      <p className="text-3xl font-bold text-white">{calculateAverageLevel()}</p>
-                      <p className="text-xs text-gray-500 mt-1">Out of 10</p>
+                      <p className="text-2xl font-bold text-white">{calculateAverageLevel()}</p>
+                      <p className="text-xs text-gray-500 mt-1">Skill proficiency</p>
                     </div>
                     <div className="p-3 bg-purple-500/20 rounded-full">
                       <BarChart3 className="h-6 w-6 text-purple-400" />
@@ -163,9 +188,9 @@ export default function SkillsPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-400 mb-1">Expert Level</p>
                       <p className="text-3xl font-bold text-white">
-                        {skills.filter(skill => getLevelAsNumber(skill.level) >= 9).length}
+                        {skills.filter(skill => skill.level.toLowerCase() === "expert").length}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">Advanced skills</p>
+                      <p className="text-xs text-gray-500 mt-1">Expert skills</p>
                     </div>
                     <div className="p-3 bg-orange-500/20 rounded-full">
                       <Award className="h-6 w-6 text-orange-400" />
@@ -196,7 +221,7 @@ export default function SkillsPage() {
                   }`}
                 >
                   <span className="capitalize">
-                    {category === "all" ? "All Skills" : category}
+                    {category === "all" ? "All Skills" : category.replace("-", " ")}
                   </span>
                   {category !== "all" && (
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -258,8 +283,7 @@ export default function SkillsPage() {
           /* Enhanced Skills Grid */
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredSkills.map((skill) => {
-              const currentLevel = getLevelAsNumber(skill.level);
-              const progress = (currentLevel / 10) * 100;
+              const progress = getLevelProgress(skill.level);
               
               return (
                 <Card
@@ -282,7 +306,7 @@ export default function SkillsPage() {
                       variant="outline" 
                       className="bg-neutral-800 text-gray-300 border-neutral-700 hover:bg-neutral-700 font-medium capitalize"
                     >
-                      {skill.category}
+                      {skill.category.replace("-", " ")}
                     </Badge>
                     
                     {/* Level Information */}
@@ -292,17 +316,15 @@ export default function SkillsPage() {
                           <Target className="h-4 w-4 text-gray-400" />
                           <span className="text-sm font-medium text-gray-400">Level</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge className={`${getLevelColor(skill.level)} border font-semibold`}>
-                            {skill.level}/10
-                          </Badge>
-                        </div>
+                        <Badge className={`${getLevelColor(skill.level)} border font-semibold`}>
+                          {capitalizeLevel(skill.level)}
+                        </Badge>
                       </div>
 
                       {/* Progress Bar */}
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-gray-400">Progress</span>
+                          <span className="text-xs text-gray-400">Proficiency</span>
                           <span className="text-xs font-medium text-white">{Math.round(progress)}%</span>
                         </div>
                         <Progress 
@@ -311,12 +333,13 @@ export default function SkillsPage() {
                         />
                       </div>
 
-                      {/* Level Label */}
+                      {/* Level Description */}
                       <div className="flex items-center justify-between pt-2">
-                        <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
-                          getLevelColor(skill.level)
-                        }`}>
-                          {getLevelLabel(skill.level)}
+                        <span className="text-xs text-gray-400">
+                          {skill.level === "beginner" && "Learning basics"}
+                          {skill.level === "intermediate" && "Good working knowledge"}
+                          {skill.level === "advanced" && "Strong expertise"}
+                          {skill.level === "expert" && "Master level"}
                         </span>
                         <div className="flex items-center text-gray-500 group-hover:text-gray-400 transition-colors">
                           <span className="text-xs">View Details</span>
@@ -339,7 +362,7 @@ export default function SkillsPage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-3">No Skills Found</h3>
               <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                No skills match the selected category <strong>&quot;{selectedCategory}&quot;</strong>. 
+                No skills match the selected category <strong>&quot;{selectedCategory.replace("-", " ")}&quot;</strong>. 
                 Try selecting a different category or view all skills.
               </p>
               <div className="space-y-3">
@@ -352,6 +375,32 @@ export default function SkillsPage() {
                 <p className="text-sm text-gray-500">
                   or create a new skill in this category
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Skill Level Legend */}
+        {!loading && skills.length > 0 && (
+          <Card className="bg-neutral-900 border-neutral-800 shadow-lg mt-8">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Skill Level Guide</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {[
+                  { level: "beginner", description: "Learning the basics" },
+                  { level: "intermediate", description: "Good working knowledge" },
+                  { level: "advanced", description: "Strong expertise" },
+                  { level: "expert", description: "Master level proficiency" }
+                ].map(({ level, description }) => (
+                  <div key={level} className="flex items-center gap-3">
+                    <Badge className={`${getLevelColor(level)} border font-medium`}>
+                      {capitalizeLevel(level)}
+                    </Badge>
+                    <span className="text-xs text-gray-400">{description}</span>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
