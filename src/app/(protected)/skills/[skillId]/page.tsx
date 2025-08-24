@@ -1,13 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Skill } from "@/types";
 import { Button } from "@/app/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
 import { Badge } from "@/app/components/ui/badge";
 import { Progress } from "@/app/components/ui/progress";
-import { Skill } from "@/types";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { 
   ChevronLeft, 
   Edit, 
@@ -21,7 +21,8 @@ import {
   AlertTriangle,
   Sparkles,
   BarChart3,
-  Award
+  Award,
+  ArrowRight
 } from "lucide-react";
 import { api } from "@/lib/api";
 
@@ -102,30 +103,46 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
     fetchSkill();
   }, [params]);
 
-  // Helper function to convert level to number safely
-  const getLevelAsNumber = (level: string | number): number => {
-    return typeof level === 'string' ? parseInt(level) || 0 : level;
+  // Get level color and label
+  const getLevelColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case "beginner":
+        return { 
+          color: "bg-red-500/20 text-red-400 border-red-500/30", 
+          label: "Beginner" 
+        };
+      case "intermediate":
+        return { 
+          color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", 
+          label: "Intermediate" 
+        };
+      case "advanced":
+        return { 
+          color: "bg-blue-500/20 text-blue-400 border-blue-500/30", 
+          label: "Advanced" 
+        };
+      case "expert":
+        return { 
+          color: "bg-green-500/20 text-green-400 border-green-500/30", 
+          label: "Expert" 
+        };
+      default:
+        return { 
+          color: "bg-gray-500/20 text-gray-400 border-gray-500/30", 
+          label: "Beginner" 
+        };
+    }
   };
 
-  // Get level color and label
-  const getLevelColor = (level: string | number) => {
-    const numLevel = getLevelAsNumber(level);
-    if (numLevel <= 3) return { 
-      color: "bg-red-500 text-white", 
-      label: "Beginner" 
-    };
-    if (numLevel <= 6) return { 
-      color: "bg-orange-500 text-white", 
-      label: "Intermediate" 
-    };
-    if (numLevel <= 8) return { 
-      color: "bg-blue-500 text-white", 
-      label: "Advanced" 
-    };
-    return { 
-      color: "bg-green-500 text-white", 
-      label: "Expert" 
-    };
+  // Get level progress percentage (out of 4 levels)
+  const getLevelProgress = (level: string): number => {
+    switch (level.toLowerCase()) {
+      case "beginner": return 25;
+      case "intermediate": return 50;
+      case "advanced": return 75;
+      case "expert": return 100;
+      default: return 25;
+    }
   };
 
   if (loading) {
@@ -165,8 +182,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
   }
 
   const levelInfo = getLevelColor(skill.level);
-  const currentLevel = getLevelAsNumber(skill.level);
-  const skillProgress = (currentLevel / 10) * 100;
+  const skillProgress = getLevelProgress(skill.level);
 
   return (
     <div className="min-h-screen bg-black">
@@ -177,7 +193,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
             variant="ghost" 
             size="icon" 
             onClick={() => router.back()} 
-            className="h-9 w-9 text-gray-400 hover:text-white hover:bg-neutral-800"
+            className="h-10 w-10 text-gray-400 hover:text-white hover:bg-neutral-800"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -186,12 +202,12 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
             <div className="flex items-center gap-3">
               <Badge 
                 variant="outline" 
-                className="text-sm px-3 py-1 bg-neutral-800 text-gray-300 border-neutral-600"
+                className="text-sm px-3 py-1 bg-neutral-800 text-gray-300 border-neutral-600 capitalize"
               >
-                {skill.category}
+                {skill.category.replace("-", " ")}
               </Badge>
-              <Badge className={`${levelInfo.color} border-0 font-medium`}>
-                Level {skill.level}/10
+              <Badge className={`${levelInfo.color} border font-medium`}>
+                {levelInfo.label}
               </Badge>
             </div>
           </div>
@@ -201,7 +217,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Skill Overview Card */}
-            <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
+            <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader className="pb-4">
                 <CardTitle className="text-xl flex items-center gap-2 text-white">
                   <TrendingUp className="h-5 w-5 text-gray-400" />
@@ -212,24 +228,24 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                 {/* Progress Section */}
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-white">
-                    <span className="text-sm font-medium">Overall Completion</span>
+                    <span className="text-sm font-medium">Overall Proficiency</span>
                     <span className="text-sm">{Math.round(skillProgress)}%</span>
                   </div>
-                  <Progress value={skillProgress} className="h-3" />
+                  <Progress value={skillProgress} className="h-2 bg-neutral-700" />
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700">
+                  <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:bg-neutral-700/50 transition-colors">
                     <div className="flex items-center gap-2 text-gray-400">
                       <Target className="h-4 w-4" />
                       <span className="text-xs">Current Level</span>
                     </div>
-                    <p className="font-semibold text-white text-lg">{skill.level}/10</p>
-                    <p className="text-xs text-gray-400">{levelInfo.label}</p>
+                    <p className="font-semibold text-white text-lg">{levelInfo.label}</p>
+                    <p className="text-xs text-gray-400">Proficiency</p>
                   </div>
                   
-                  <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700">
+                  <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:bg-neutral-700/50 transition-colors">
                     <div className="flex items-center gap-2 text-gray-400">
                       <BarChart3 className="h-4 w-4" />
                       <span className="text-xs">Progress</span>
@@ -238,12 +254,12 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                     <p className="text-xs text-gray-400">Completed</p>
                   </div>
                   
-                  <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700">
+                  <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:bg-neutral-700/50 transition-colors">
                     <div className="flex items-center gap-2 text-gray-400">
                       <Award className="h-4 w-4" />
                       <span className="text-xs">Category</span>
                     </div>
-                    <p className="font-semibold text-white text-sm">{skill.category}</p>
+                    <p className="font-semibold text-white text-sm capitalize">{skill.category.replace("-", " ")}</p>
                     <p className="text-xs text-gray-400">Domain</p>
                   </div>
                 </div>
@@ -251,7 +267,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
             </Card>
 
             {/* Description Card */}
-            <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
+            <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <BookOpen className="h-5 w-5 text-gray-400" />
@@ -269,11 +285,11 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-neutral-800 rounded-lg border border-neutral-700">
                   <div>
                     <h4 className="font-medium text-white mb-1">Skill Category</h4>
-                    <p className="text-gray-400">{skill.category}</p>
+                    <p className="text-gray-400 capitalize">{skill.category.replace("-", " ")}</p>
                   </div>
                   <div>
                     <h4 className="font-medium text-white mb-1">Proficiency Level</h4>
-                    <p className="text-gray-400">{levelInfo.label} ({skill.level}/10)</p>
+                    <p className="text-gray-400">{levelInfo.label}</p>
                   </div>
                 </div>
               </CardContent>
@@ -283,7 +299,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
           {/* Sidebar Actions */}
           <div className="space-y-6">
             {/* Quick Actions Card */}
-            <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
+            <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Sparkles className="h-5 w-5 text-gray-400" />
@@ -311,7 +327,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
             </Card>
 
             {/* Create Plan Card */}
-            <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
+            <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Calendar className="h-5 w-5 text-gray-400" />
@@ -333,33 +349,40 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
             </Card>
 
             {/* Level Breakdown Card */}
-            <Card className="bg-neutral-900 border-neutral-800 shadow-lg">
+            <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader>
                 <CardTitle className="text-white">Level Breakdown</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-300">Beginner (1-3)</span>
-                    <span className={currentLevel >= 1 && currentLevel <= 3 ? "font-bold text-red-400" : "text-gray-600"}>1-3</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-300">Intermediate (4-6)</span>
-                    <span className={currentLevel >= 4 && currentLevel <= 6 ? "font-bold text-orange-400" : "text-gray-600"}>4-6</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-300">Advanced (7-8)</span>
-                    <span className={currentLevel >= 7 && currentLevel <= 8 ? "font-bold text-blue-400" : "text-gray-600"}>7-8</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-300">Expert (9-10)</span>
-                    <span className={currentLevel >= 9 && currentLevel <= 10 ? "font-bold text-green-400" : "text-gray-600"}>9-10</span>
-                  </div>
+                  {[
+                    { level: "beginner", range: "1-3", description: "Learning basics" },
+                    { level: "intermediate", range: "4-6", description: "Good working knowledge" },
+                    { level: "advanced", range: "7-8", description: "Strong expertise" },
+                    { level: "expert", range: "9-10", description: "Master level" }
+                  ].map((item) => {
+                    const isCurrent = skill.level.toLowerCase() === item.level;
+                    const levelColor = getLevelColor(item.level);
+                    
+                    return (
+                      <div key={item.level} className="flex justify-between items-center py-1">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full ${isCurrent ? levelColor.color.split(' ')[0] : "bg-neutral-700"}`}></div>
+                          <span className={`text-sm ${isCurrent ? "font-bold text-white" : "text-gray-400"}`}>
+                            {item.level.charAt(0).toUpperCase() + item.level.slice(1)}
+                          </span>
+                        </div>
+                        <span className={`text-xs ${isCurrent ? "font-bold text-white" : "text-gray-500"}`}>
+                          {item.range}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
                 
                 <div className="pt-3 border-t border-neutral-700">
                   <p className="text-sm text-gray-400">
-                    Current: <span className="font-medium text-white">{levelInfo.label}</span>
+                    Current: <span className={`font-medium ${levelInfo.color.split(' ')[1]}`}>{levelInfo.label}</span>
                   </p>
                 </div>
               </CardContent>
