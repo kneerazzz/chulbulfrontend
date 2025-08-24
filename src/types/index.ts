@@ -24,3 +24,15 @@ export type DailyTopic = {
   createdAt: string;          // from timestamps: true
   updatedAt: string;          // from timestamps: true
 }
+
+
+export type SkillPlan = {
+  _id: string;
+  user: string;
+  targetLevel: string;
+  skill: string;
+  durationInDays: number;
+  currentDay: number;
+  isCompleted: boolean;
+  completedDays: [number];
+}

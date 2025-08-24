@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Skill } from "@/types";
+import { Skill, SkillPlan } from "@/types";
 import { Button } from "@/app/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
 import { Badge } from "@/app/components/ui/badge";
@@ -22,17 +22,26 @@ import {
   Sparkles,
   BarChart3,
   Award,
-  ArrowRight
+  FileText,
+  Clock,
+  CheckCircle,
+  PlayCircle,
+  BookmarkPlus
 } from "lucide-react";
 import { api } from "@/lib/api";
 
 export default function SkillDetailPage({ params }: { params: Promise<{ skillId: string }> }) {
   const [skill, setSkill] = useState<Skill | null>(null);
+  const [skillPlan, setSkillPlan] = useState<SkillPlan | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
   const router = useRouter();
 
   async function deleteSkill() {
+    if (actionLoading) return;
+    setActionLoading(true);
+    
     try {
       const resolvedParams = await params;
       const { skillId } = resolvedParams;
@@ -45,25 +54,34 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       router.push("/skills");
 
     } catch (error: any) {
-      setError("Failed to delete skill");
-      console.log(error)
+      console.log(error);
       toast.error("Failed to delete skill");
+    } finally {
+      setActionLoading(false);
     }
   }
 
   async function createSkillPlan() {
+    if (actionLoading) return;
+    setActionLoading(true);
+    
     try {
       const resolvedParams = await params;
       const { skillId } = resolvedParams;
 
       router.push(`/skills/${skillId}/create-plan`);
     } catch (error) {
-      console.error("Error in create-plan", error);
-      setError("Failed to create-plan");
+      console.error("Error navigating to create plan", error);
+      toast.error("Failed to navigate to create plan");
+    } finally {
+      setActionLoading(false);
     }
   }
 
   async function updateSkill() {
+    if (actionLoading) return;
+    setActionLoading(true);
+    
     try {
       const resolvedParams = await params;
       const { skillId } = resolvedParams;
@@ -71,8 +89,27 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       router.push(`/skills/${skillId}/update`);
 
     } catch (error) {
-      console.error("Error in updating skill", error);
-      setError("Failed to update skill");
+      console.error("Error navigating to update skill", error);
+      toast.error("Failed to navigate to update skill");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  async function viewSkillPlan() {
+    if (actionLoading || !skillPlan) return;
+    setActionLoading(true);
+    
+    try {
+      const resolvedParams = await params;
+      const { skillId } = resolvedParams;
+
+      router.push(`/skillPlans/${skillPlan._id}`);
+    } catch (error) {
+      console.error("Error navigating to skill plan", error);
+      toast.error("Failed to navigate to skill plan");
+    } finally {
+      setActionLoading(false);
     }
   }
 
@@ -86,7 +123,8 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
           withCredentials: true
         });
 
-        setSkill(response.data.data);
+        setSkill(response.data.data.skill);
+        setSkillPlan(response.data.data.skillPlan || null);
       } catch (error: any) {
         console.error("[Frontend] Full error details:", {
           message: error.message,
@@ -95,6 +133,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
           data: error.response?.data
         });
         setError("Failed to load skill");
+        toast.error("Failed to load skill details");
       } finally {
         setLoading(false);
       }
@@ -145,6 +184,16 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
     }
   };
 
+  // Calculate skill plan progress if it exists
+  const getSkillPlanProgress = () => {
+    if (!skillPlan) return 0;
+    
+    const completedDays = skillPlan.completedDays?.length || 0;
+    const totalDays = skillPlan.durationInDays || 30;
+    
+    return Math.round((completedDays / totalDays) * 100);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -183,6 +232,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
 
   const levelInfo = getLevelColor(skill.level);
   const skillProgress = getLevelProgress(skill.level);
+  const planProgress = getSkillPlanProgress();
 
   return (
     <div className="min-h-screen bg-black">
@@ -199,7 +249,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
           </Button>
           <div className="flex-1">
             <h1 className="text-4xl font-bold text-white mb-2">{skill.title}</h1>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Badge 
                 variant="outline" 
                 className="text-sm px-3 py-1 bg-neutral-800 text-gray-300 border-neutral-600 capitalize"
@@ -209,6 +259,12 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
               <Badge className={`${levelInfo.color} border font-medium`}>
                 {levelInfo.label}
               </Badge>
+              {skillPlan && (
+                <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  {skillPlan.isCompleted ? 'Plan Completed' : 'Plan Active'}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
@@ -225,14 +281,32 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Progress Section */}
+                {/* Skill Proficiency Progress */}
                 <div className="space-y-3">
                   <div className="flex justify-between items-center text-white">
-                    <span className="text-sm font-medium">Overall Proficiency</span>
+                    <span className="text-sm font-medium">Skill Proficiency</span>
                     <span className="text-sm">{Math.round(skillProgress)}%</span>
                   </div>
                   <Progress value={skillProgress} className="h-2 bg-neutral-700" />
                 </div>
+
+                {/* Plan Progress (if exists) */}
+                {skillPlan && (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-white">
+                      <span className="text-sm font-medium">Learning Plan Progress</span>
+                      <span className="text-sm">{planProgress}%</span>
+                    </div>
+                    <Progress value={planProgress} className="h-2 bg-neutral-700" />
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <Clock className="h-3 w-3" />
+                      <span>
+                        Day {skillPlan.currentDay} of {skillPlan.durationInDays} 
+                        {skillPlan.isCompleted && " • Completed!"}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -250,8 +324,12 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                       <BarChart3 className="h-4 w-4" />
                       <span className="text-xs">Progress</span>
                     </div>
-                    <p className="font-semibold text-white text-lg">{Math.round(skillProgress)}%</p>
-                    <p className="text-xs text-gray-400">Completed</p>
+                    <p className="font-semibold text-white text-lg">
+                      {skillPlan ? `${planProgress}%` : `${Math.round(skillProgress)}%`}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {skillPlan ? 'Plan Progress' : 'Skill Level'}
+                    </p>
                   </div>
                   
                   <div className="flex flex-col gap-1 p-4 bg-neutral-800 rounded-lg border border-neutral-700 hover:bg-neutral-700/50 transition-colors">
@@ -291,6 +369,18 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
                     <h4 className="font-medium text-white mb-1">Proficiency Level</h4>
                     <p className="text-gray-400">{levelInfo.label}</p>
                   </div>
+                  {skillPlan && (
+                    <>
+                      <div>
+                        <h4 className="font-medium text-white mb-1">Target Level</h4>
+                        <p className="text-gray-400 capitalize">{skillPlan.targetLevel}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-white mb-1">Plan Duration</h4>
+                        <p className="text-gray-400">{skillPlan.durationInDays} days</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -303,22 +393,24 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
                   <Sparkles className="h-5 w-5 text-gray-400" />
-                  Plan Actions
+                  Quick Actions
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button 
                   onClick={updateSkill}
+                  disabled={actionLoading}
                   variant="outline" 
-                  className="w-full justify-start gap-2 bg-neutral-800 border-neutral-700 text-gray-300 hover:bg-neutral-700 hover:text-white"
+                  className="w-full justify-start gap-2 bg-neutral-800 border-neutral-700 text-gray-300 hover:bg-neutral-700 hover:text-white disabled:opacity-50"
                 >
                   <Edit className="h-4 w-4" />
                   Edit Skill
                 </Button>
                 <Button 
                   onClick={deleteSkill}
+                  disabled={actionLoading}
                   variant="outline" 
-                  className="w-full justify-start gap-2 text-red-400 border-red-500/30 hover:text-red-300 hover:bg-red-500/10"
+                  className="w-full justify-start gap-2 text-red-400 border-red-500/30 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-50"
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete Skill
@@ -326,64 +418,175 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
               </CardContent>
             </Card>
 
-            {/* Create Plan Card */}
-            <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                  Learning Plan
-                </CardTitle>
-                <p className="text-gray-400 text-sm">
-                  Create a structured learning plan to improve this skill
-                </p>
-              </CardHeader>
-              <CardContent>
-                <Button 
-                  onClick={createSkillPlan}
-                  className="w-full gap-2 bg-white text-black hover:bg-gray-100 border-0"
-                >
-                  <Plus className="h-4 w-4" />
-                  Create Learning Plan
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Learning Plan Section */}
+            {skillPlan ? (
+              <Card className="bg-neutral-900 border-green-500/30 shadow-lg hover:shadow-xl transition-all duration-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <FileText className="h-5 w-5 text-green-400" />
+                    Learning Plan
+                  </CardTitle>
+                  <p className="text-gray-400 text-sm">
+                    {skillPlan.isCompleted 
+                      ? 'Congratulations! You completed your learning plan.' 
+                      : 'You have an active learning plan for this skill'
+                    }
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Plan Status */}
+                  <div className={`flex items-center gap-3 p-3 rounded-lg border ${
+                    skillPlan.isCompleted 
+                      ? 'bg-green-500/10 border-green-500/20' 
+                      : 'bg-blue-500/10 border-blue-500/20'
+                  }`}>
+                    <div className={`h-5 w-5 flex-shrink-0 ${
+                      skillPlan.isCompleted ? 'text-green-400' : 'text-blue-400'
+                    }`}>
+                      {skillPlan.isCompleted ? <CheckCircle className="h-5 w-5" /> : <PlayCircle className="h-5 w-5" />}
+                    </div>
+                    <div>
+                      <p className={`text-sm font-medium ${
+                        skillPlan.isCompleted ? 'text-green-400' : 'text-blue-400'
+                      }`}>
+                        {skillPlan.isCompleted ? 'Plan Completed!' : 'Plan Active'}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {skillPlan.isCompleted 
+                          ? `Completed in ${skillPlan.completedDays?.length || 0} days`
+                          : `Day ${skillPlan.currentDay} of ${skillPlan.durationInDays}`
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Plan Progress Details */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Progress</span>
+                      <span className="text-white font-medium">{planProgress}%</span>
+                    </div>
+                    <Progress value={planProgress} className="h-1 bg-neutral-700" />
+                    <div className="flex justify-between text-xs text-gray-500">
+                      <span>{skillPlan.completedDays?.length || 0} completed</span>
+                      <span>{skillPlan.durationInDays} total days</span>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={viewSkillPlan}
+                    disabled={actionLoading}
+                    className="w-full gap-2 bg-green-600 text-white hover:bg-green-700 border-0 disabled:opacity-50"
+                  >
+                    {actionLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileText className="h-4 w-4" />
+                    )}
+                    {skillPlan.isCompleted ? 'View Completed Plan' : 'Continue Learning Plan'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-white">
+                    <BookmarkPlus className="h-5 w-5 text-gray-400" />
+                    Start Learning
+                  </CardTitle>
+                  <p className="text-gray-400 text-sm">
+                    Create a structured learning plan to improve this skill systematically
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Benefits */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-white">What you'll get:</h4>
+                    <ul className="text-xs text-gray-400 space-y-1">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 text-green-400 flex-shrink-0" />
+                        <span>Personalized daily learning topics</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 text-green-400 flex-shrink-0" />
+                        <span>Progress tracking and streaks</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="h-3 w-3 mt-0.5 text-green-400 flex-shrink-0" />
+                        <span>Structured learning path</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <Button 
+                    onClick={createSkillPlan}
+                    disabled={actionLoading}
+                    className="w-full gap-2 bg-white text-black hover:bg-gray-100 border-0 disabled:opacity-50"
+                  >
+                    {actionLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                    Create Learning Plan
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Level Breakdown Card */}
             <Card className="bg-neutral-900 border-neutral-800 shadow-lg hover:shadow-xl transition-all duration-200">
               <CardHeader>
-                <CardTitle className="text-white">Level Breakdown</CardTitle>
+                <CardTitle className="text-white">Proficiency Levels</CardTitle>
+                <p className="text-gray-400 text-sm">Track your skill development journey</p>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="space-y-2">
                   {[
-                    { level: "beginner", range: "1-3", description: "Learning basics" },
-                    { level: "intermediate", range: "4-6", description: "Good working knowledge" },
-                    { level: "advanced", range: "7-8", description: "Strong expertise" },
-                    { level: "expert", range: "9-10", description: "Master level" }
+                    { level: "beginner", description: "Learning basics", percentage: 25 },
+                    { level: "intermediate", description: "Good working knowledge", percentage: 50 },
+                    { level: "advanced", description: "Strong expertise", percentage: 75 },
+                    { level: "expert", description: "Master level", percentage: 100 }
                   ].map((item) => {
                     const isCurrent = skill.level.toLowerCase() === item.level;
                     const levelColor = getLevelColor(item.level);
                     
                     return (
-                      <div key={item.level} className="flex justify-between items-center py-1">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full ${isCurrent ? levelColor.color.split(' ')[0] : "bg-neutral-700"}`}></div>
+                      <div key={item.level} className={`flex justify-between items-center py-2 px-3 rounded-lg transition-colors ${
+                        isCurrent ? 'bg-neutral-800 border border-neutral-600' : 'hover:bg-neutral-800/50'
+                      }`}>
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 rounded-full ${
+                            isCurrent ? levelColor.color.split(' ')[0] : "bg-neutral-700"
+                          }`}></div>
                           <span className={`text-sm ${isCurrent ? "font-bold text-white" : "text-gray-400"}`}>
                             {item.level.charAt(0).toUpperCase() + item.level.slice(1)}
                           </span>
                         </div>
-                        <span className={`text-xs ${isCurrent ? "font-bold text-white" : "text-gray-500"}`}>
-                          {item.range}
-                        </span>
+                        <div className="text-right">
+                          <span className={`text-xs ${isCurrent ? "font-bold text-white" : "text-gray-500"}`}>
+                            {item.description}
+                          </span>
+                          <div className={`text-xs ${isCurrent ? "text-white" : "text-gray-500"}`}>
+                            {item.percentage}%
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
                 </div>
                 
                 <div className="pt-3 border-t border-neutral-700">
-                  <p className="text-sm text-gray-400">
-                    Current: <span className={`font-medium ${levelInfo.color.split(' ')[1]}`}>{levelInfo.label}</span>
-                  </p>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-400">
+                      Current: <span className={`font-medium ${levelInfo.color.split(' ')[1]}`}>{levelInfo.label}</span>
+                    </p>
+                    {skillPlan && (
+                      <p className="text-sm text-gray-400">
+                        Target: <span className="font-medium text-blue-400 capitalize">{skillPlan.targetLevel}</span>
+                      </p>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

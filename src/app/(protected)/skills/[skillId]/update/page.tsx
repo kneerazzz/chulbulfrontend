@@ -220,7 +220,7 @@ const UpdateSkillPage = () => {
     setIsLoading(true);
 
     try {
-      await api.patch(`/skills/c/${skillId}update-skill`, formData, {
+      await api.patch(`/skills/c/${skillId}/update-skill`, formData, {
         withCredentials: true,
       });
       toast.success("Skill updated successfully!");
