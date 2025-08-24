@@ -202,7 +202,7 @@ const UpdateSkillPage = () => {
           withCredentials: true,
         });
 
-        const { title, category, level = "beginner", description = "" } = response.data.data;
+        const { title, category, level = "beginner", description = "" } = response.data.data.skill;
         const skillData = { title, category, level, description };
         
         setFormData(skillData);
