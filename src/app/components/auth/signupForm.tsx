@@ -52,7 +52,9 @@ export function AuthForm() {
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     setIsLoading(true);
     try {
-      const res = await api.post("/users/register", data)
+      const res = await api.post("/users/register", data , {
+        withCredentials: true
+      })
       const {user} = res.data.data;
       if(!res.data.success){
         toast.error(res.data.message || "Something went wrong")

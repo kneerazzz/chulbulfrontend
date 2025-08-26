@@ -55,7 +55,9 @@ export function LoginAuthForm() {
         email: data.identifier.includes("@") ? data.identifier : undefined,
         password: data.password
       };
-      const res = await api.post("/users/login", payload);
+      const res = await api.post("/users/login", payload, {
+        withCredentials: true
+      });
       const { user } = res.data.data
 
       login(user)
