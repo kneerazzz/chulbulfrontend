@@ -185,7 +185,7 @@ export default function SkillPlanDetailPage() {
   // -------- Actions --------
   const deleteSkillPlan = async () => {
     try {
-      await api.delete(`/skillplans/c/${skillPlanId}delete-skill-plan`, { withCredentials: true });
+      await api.delete(`/skillplans/c/${skillPlanId}/delete-skill-plan`, { withCredentials: true });
       toast.success("Skill Plan deleted");
       router.push("/skillPlans");
     } catch (err) {
