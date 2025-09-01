@@ -38,7 +38,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
   const router = useRouter();
 
   async function deleteSkill() {
-    if (actionLoading) return;
+    if (actionLoading || !skillPlan) return;
     setActionLoading(true);
     
     try {
@@ -48,6 +48,7 @@ export default function SkillDetailPage({ params }: { params: Promise<{ skillId:
       await api.delete(`/skills/c/${skillId}/delete-skill`, {
         withCredentials: true
       });
+      await api.delete(`/skillplans/c/${skillPlan._id}/delete-skill-plan`)
 
       toast.success("Skill deleted successfully");
       router.push("/skills");
